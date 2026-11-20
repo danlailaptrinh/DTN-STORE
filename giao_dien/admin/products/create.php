@@ -1,0 +1,112 @@
+<?php
+use App\Helpers\SecurityHelper;
+?>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h4 fw-bold mb-0">Thêm điện thoại mới</h1>
+    <a href="<?= SecurityHelper::url('/admin/products') ?>" class="btn btn-outline-secondary btn-sm">Quay lại</a>
+</div>
+
+<form action="<?= SecurityHelper::url('/admin/products/store') ?>" method="POST" enctype="multipart/form-data">
+    <?= SecurityHelper::csrfField() ?>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h6 fw-bold mb-3">Thông tin điện thoại</h2>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Tên điện thoại <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control" placeholder="VD: iPhone 17 Pro" required>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Danh mục (Thương hiệu) <span class="text-danger">*</span></label>
+                            <select name="category_id" class="form-select" required>
+                                <option value="">-- Chọn danh mục --</option>
+                                <?php foreach ($categories as $cat): ?>
+                                    <option value="<?= (int) $cat['id'] ?>"><?= SecurityHelper::e($cat['name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Trạng thái hiển thị</label>
+                            <select name="status" class="form-select">
+                                <option value="1" selected>Hiển thị</option>
+                                <option value="0">Ẩn</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Mô tả sản phẩm</label>
+                        <textarea name="description" class="form-control" rows="4" placeholder="Mô tả tổng quan về thiết kế, hiệu năng, camera..."></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Thông số kỹ thuật (mỗi thông số ngăn cách bằng dấu <code>|</code>)</label>
+                        <textarea name="specifications" class="form-control" rows="3" placeholder="Màn hình: 6.7 inch OLED|Chip: A19 Pro|Pin: 4800mAh"></textarea>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="is_featured" id="isFeaturedCheck" value="1">
+                        <label class="form-check-label small fw-semibold" for="isFeaturedCheck">
+                            Đánh dấu là Điện thoại nổi bật trên Trang chủ
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <!-- Upload hình ảnh -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h2 class="h6 fw-bold mb-2">Hình ảnh điện thoại</h2>
+                    <p class="small text-muted mb-3">Hỗ trợ chọn nhiều ảnh (JPG, PNG, WEBP - tối đa 2MB/ảnh). Ảnh đầu tiên sẽ là ảnh đại diện.</p>
+                    <input type="file" name="images[]" class="form-control" accept=".jpg,.jpeg,.png,.webp" multiple>
+                </div>
+            </div>
+
+            <!-- Biến thể đầu tiên -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="h6 fw-bold mb-2">Biến thể đầu tiên (nên nhập để bán ngay)</h2>
+                    <p class="small text-muted mb-3">Sau khi lưu, bạn có thể thêm nhiều tổ hợp RAM / Dung lượng / Màu sắc khác.</p>
+
+                    <div class="row g-2 mb-2">
+                        <div class="col-4">
+                            <label class="form-label small fw-semibold">RAM</label>
+                            <input type="text" name="init_ram" class="form-control form-control-sm" placeholder="VD: 12GB">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label small fw-semibold">Dung lượng</label>
+                            <input type="text" name="init_storage" class="form-control form-control-sm" placeholder="VD: 256GB">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label small fw-semibold">Màu sắc</label>
+                            <input type="text" name="init_color" class="form-control form-control-sm" placeholder="VD: Đen">
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Giá bán (VNĐ)</label>
+                            <input type="number" name="init_price" class="form-control form-control-sm" min="0" step="1000" placeholder="29990000">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Giá khuyến mãi</label>
+                            <input type="number" name="init_sale_price" class="form-control form-control-sm" min="0" step="1000" placeholder="Để trống nếu không giảm">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-dtd w-100 py-2">
+                        <i class="bi bi-save me-1"></i>Lưu điện thoại & Tiếp tục quản lý biến thể
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

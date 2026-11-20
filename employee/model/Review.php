@@ -1,0 +1,2 @@
+<?php
+// Model trống.

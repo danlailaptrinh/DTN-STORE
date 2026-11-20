@@ -1,0 +1,85 @@
+/* Giao diện Dashboard thống nhất cho Admin & Nhân viên (DTD STORE) */
+:root {
+    --dtd-red: #d70018;
+    --dtd-red-dark: #b30014;
+    --dtd-sidebar-bg: #1e2125;
+}
+
+body {
+    background-color: #f4f6f8;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.dashboard-wrapper {
+    min-height: 100vh;
+}
+
+.dashboard-sidebar {
+    width: 260px;
+    background-color: var(--dtd-sidebar-bg);
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.dashboard-sidebar .brand-box {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dashboard-sidebar .nav-link {
+    color: rgba(255, 255, 255, 0.78);
+    border-radius: 8px;
+    padding: 0.65rem 0.9rem;
+    margin-bottom: 0.25rem;
+    font-size: 0.94rem;
+    transition: all 0.18s ease;
+}
+
+.dashboard-sidebar .nav-link:hover {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.dashboard-sidebar .nav-link.active {
+    color: #fff;
+    background-color: var(--dtd-red);
+    font-weight: 600;
+}
+
+.dashboard-main {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.dashboard-topbar {
+    background-color: #fff;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.stat-card {
+    border: none;
+    border-radius: 12px;
+    transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+}
+
+.btn-dtd {
+    background-color: var(--dtd-red);
+    border-color: var(--dtd-red);
+    color: #fff;
+    font-weight: 600;
+}
+
+.btn-dtd:hover {
+    background-color: var(--dtd-red-dark);
+    border-color: var(--dtd-red-dark);
+    color: #fff;
+}
+
+@media (max-width: 991.98px) {
+    .dashboard-sidebar {
+        width: 100%;
+    }
+}

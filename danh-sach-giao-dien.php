@@ -1,0 +1,1 @@
+<!doctype html><html lang="vi"><meta charset="utf-8"><title>Danh sách giao diện</title><h1>Danh sách giao diện PHP</h1><ul><?php foreach(require __DIR__.'/demo/routes.php' as $route=>$template): ?><li><a href="index.php?route=<?= rawurlencode($route) ?>"><?= htmlspecialchars($route) ?> — <?= htmlspecialchars($template) ?></a></li><?php endforeach ?></ul></html>

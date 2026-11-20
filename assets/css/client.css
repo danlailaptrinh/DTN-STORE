@@ -1,0 +1,266 @@
+/* Giao diện Client DTD STORE - Tông Đỏ thương hiệu (#d70018), Trắng, Đen, Xám nhạt */
+:root {
+    --dtd-red: #d70018;
+    --dtd-red-dark: #b30014;
+    --dtd-bg: #f4f6f8;
+    --dtd-text: #212529;
+    --dtd-muted: #6c757d;
+}
+
+body {
+    background-color: var(--dtd-bg);
+    color: var(--dtd-text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Header & Navigation */
+.dtd-header {
+    background-color: var(--dtd-red);
+}
+
+.dtd-search-input {
+    border: none;
+    border-radius: 8px 0 0 8px;
+}
+
+.dtd-search-btn {
+    background-color: #212529;
+    color: #fff;
+    border: none;
+    border-radius: 0 8px 8px 0;
+}
+
+.dtd-search-btn:hover {
+    background-color: #000;
+    color: #fff;
+}
+
+.dtd-category-bar {
+    background-color: #fff;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.dtd-category-link {
+    color: var(--dtd-text);
+    font-weight: 500;
+    padding: 0.5rem 0.9rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.dtd-category-link:hover,
+.dtd-category-link.active {
+    background-color: rgba(215, 0, 24, 0.08);
+    color: var(--dtd-red);
+}
+
+/* Buttons */
+.btn-dtd {
+    background-color: var(--dtd-red);
+    border-color: var(--dtd-red);
+    color: #fff;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-dtd:hover {
+    background-color: var(--dtd-red-dark);
+    border-color: var(--dtd-red-dark);
+    color: #fff;
+}
+
+.btn-outline-dtd {
+    border-color: var(--dtd-red);
+    color: var(--dtd-red);
+    font-weight: 600;
+}
+
+.btn-outline-dtd:hover {
+    background-color: var(--dtd-red);
+    color: #fff;
+}
+
+/* Product Card */
+.dtd-product-card {
+    background: #fff;
+    border: 1px solid #eceef0;
+    border-radius: 12px;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.dtd-product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+}
+
+.dtd-product-thumb {
+    position: relative;
+    background: #fff;
+    padding: 1.25rem 1rem 0.75rem;
+    text-align: center;
+    height: 210px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dtd-product-thumb img {
+    max-height: 175px;
+    max-width: 100%;
+    object-fit: contain;
+    transition: transform 0.25s ease;
+}
+
+.dtd-product-card:hover .dtd-product-thumb img {
+    transform: scale(1.04);
+}
+
+.dtd-discount-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: var(--dtd-red);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+}
+
+.dtd-product-title {
+    font-size: 0.96rem;
+    font-weight: 600;
+    color: var(--dtd-text);
+    text-decoration: none;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.75rem;
+}
+
+.dtd-product-title:hover {
+    color: var(--dtd-red);
+}
+
+.dtd-price-now {
+    color: var(--dtd-red);
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+.dtd-price-old {
+    color: var(--dtd-muted);
+    font-size: 0.85rem;
+    text-decoration: line-through;
+}
+
+/* Gallery & Variant Selector */
+.dtd-main-image-box {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1.5rem;
+    height: 390px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dtd-main-image-box img {
+    max-height: 340px;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.dtd-thumb-btn {
+    width: 70px;
+    height: 70px;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    background: #fff;
+    padding: 4px;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.dtd-thumb-btn.active,
+.dtd-thumb-btn:hover {
+    border-color: var(--dtd-red);
+}
+
+.dtd-thumb-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.variant-btn {
+    border: 1px solid #ced4da;
+    background-color: #fff;
+    color: var(--dtd-text);
+    border-radius: 8px;
+    padding: 0.45rem 0.9rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.variant-btn:hover:not(:disabled) {
+    border-color: var(--dtd-red);
+    color: var(--dtd-red);
+}
+
+.variant-btn.active {
+    border-color: var(--dtd-red);
+    background-color: rgba(215, 0, 24, 0.08);
+    color: var(--dtd-red);
+    font-weight: 700;
+}
+
+.variant-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    text-decoration: line-through;
+    background-color: #f8f9fa;
+}
+
+/* Hero Banner */
+.dtd-hero-banner {
+    background: linear-gradient(135deg, #d70018 0%, #8e0010 100%);
+    border-radius: 14px;
+    color: #fff;
+}
+
+@media (max-width: 575.98px) {
+    .dtd-product-thumb {
+        height: 165px;
+        padding: 0.9rem 0.75rem 0.5rem;
+    }
+
+    .dtd-product-thumb img {
+        max-height: 135px;
+    }
+
+    .dtd-main-image-box {
+        height: 270px;
+        padding: 1rem;
+    }
+
+    .dtd-main-image-box img {
+        max-height: 230px;
+    }
+
+    .dtd-thumb-btn {
+        width: 56px;
+        height: 56px;
+    }
+}
+
