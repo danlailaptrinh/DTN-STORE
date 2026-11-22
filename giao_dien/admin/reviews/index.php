@@ -1,4 +1,5 @@
 <?php
+
 use App\Helpers\SecurityHelper;
 
 $currentQuery = http_build_query(array_filter([
@@ -27,8 +28,7 @@ $currentQuery = http_build_query(array_filter([
                     name="keyword"
                     class="form-control"
                     placeholder="Tên sản phẩm, khách hàng, email hoặc nội dung..."
-                    value="<?= SecurityHelper::e($filters['keyword'] ?? '') ?>"
-                >
+                    value="<?= SecurityHelper::e($filters['keyword'] ?? '') ?>">
             </div>
 
             <div class="col-md-3">
