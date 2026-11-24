@@ -1,5 +1,5 @@
 <?php
-
+use App\Helpers\SecurityHelper;
 ?>
 
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
@@ -7,33 +7,33 @@
         <h1 class="h4 fw-bold mb-1">Quản lý người dùng & Phân quyền</h1>
         <p class="text-muted small mb-0">Tổng số: <strong><?= (int) $totalItems ?></strong> tài khoản</p>
     </div>
-    <a href="<?= viewUrl('/admin/users/create') ?>" class="btn btn-dtd">
+    <a href="<?= SecurityHelper::url('/admin/users/create') ?>" class="btn btn-dtd">
         <i class="bi bi-person-plus me-1"></i>Tạo tài khoản nhân viên / người dùng
     </a>
 </div>
 
 <!-- TÌM KIẾM & LỌC VAI TRÒ -->
-<form action="<?= viewUrl('/admin/users') ?>" method="GET" class="card border-0 shadow-sm mb-4">
+<form action="<?= SecurityHelper::url('/admin/users') ?>" method="GET" class="card border-0 shadow-sm mb-4">
     <div class="card-body">
         <div class="row g-3 align-items-end">
             <div class="col-md-5">
                 <label class="form-label small fw-semibold">Tìm kiếm (Tên, Email, SĐT)</label>
-                <input type="text" name="keyword" class="form-control" value="<?= viewE($keyword) ?>" placeholder="Nhập từ khóa...">
+                <input type="text" name="keyword" class="form-control" value="<?= SecurityHelper::e($keyword) ?>" placeholder="Nhập từ khóa...">
             </div>
             <div class="col-md-4">
                 <label class="form-label small fw-semibold">Lọc theo vai trò</label>
                 <select name="role" class="form-select">
                     <option value="">Tất cả vai trò</option>
                     <?php foreach ($roles as $r): ?>
-                        <option value="<?= viewE($r['name']) ?>" <?= $roleFilter === $r['name'] ? 'selected' : '' ?>>
-                            <?= viewE(strtoupper($r['name'])) ?> - <?= viewE($r['description']) ?>
+                        <option value="<?= SecurityHelper::e($r['name']) ?>" <?= $roleFilter === $r['name'] ? 'selected' : '' ?>>
+                            <?= SecurityHelper::e(strtoupper($r['name'])) ?> - <?= SecurityHelper::e($r['description']) ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
             </div>
             <div class="col-md-3 d-flex gap-2">
                 <button type="submit" class="btn btn-dtd w-100"><i class="bi bi-search me-1"></i>Tìm kiếm</button>
-                <a href="<?= viewUrl('/admin/users') ?>" class="btn btn-outline-secondary">Đặt lại</a>
+                <a href="<?= SecurityHelper::url('/admin/users') ?>" class="btn btn-outline-secondary">Đặt lại</a>
             </div>
         </div>
     </div>
@@ -66,10 +66,10 @@
                         ?>
                         <tr>
                             <td>#<?= (int) $u['id'] ?></td>
-                            <td class="fw-semibold"><?= viewE($u['full_name']) ?></td>
-                            <td><?= viewE($u['email']) ?></td>
-                            <td><?= viewE($u['phone'] ?: '-') ?></td>
-                            <td><span class="badge <?= $roleBadge ?>"><?= viewE(strtoupper($u['role_name'])) ?></span></td>
+                            <td class="fw-semibold"><?= SecurityHelper::e($u['full_name']) ?></td>
+                            <td><?= SecurityHelper::e($u['email']) ?></td>
+                            <td><?= SecurityHelper::e($u['phone'] ?: '-') ?></td>
+                            <td><span class="badge <?= $roleBadge ?>"><?= SecurityHelper::e(strtoupper($u['role_name'])) ?></span></td>
                             <td>
                                 <?php if ((int) $u['status'] === 1): ?>
                                     <span class="badge bg-success">Hoạt động</span>
@@ -78,13 +78,13 @@
                                 <?php endif; ?>
                             </td>
                             <td class="text-end">
-                                <a href="<?= viewUrl('/admin/users/' . (int) $u['id']) ?>" class="btn btn-sm btn-outline-primary">
+                                <a href="<?= SecurityHelper::url('/admin/users/' . (int) $u['id']) ?>" class="btn btn-sm btn-outline-primary">
                                     <i class="bi bi-eye me-1"></i>Chi tiết & Quyền
                                 </a>
 
                                 <?php if ((int) $u['id'] !== (int) $currentUser['id']): ?>
-                                    <form action="<?= viewUrl('/admin/users/toggle-status') ?>" method="POST" class="d-inline">
-                                        <?= viewCsrfField() ?>
+                                    <form action="<?= SecurityHelper::url('/admin/users/toggle-status') ?>" method="POST" class="d-inline">
+                                        <?= SecurityHelper::csrfField() ?>
                                         <input type="hidden" name="user_id" value="<?= (int) $u['id'] ?>">
                                         <?php if ((int) $u['status'] === 1): ?>
                                             <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Xác nhận khóa tài khoản này?');">
@@ -113,14 +113,14 @@
         <ul class="pagination">
             <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                 <?php
-                $url = viewUrl('/admin/users') . '?' . http_build_query(array_filter([
+                $url = SecurityHelper::url('/admin/users') . '?' . http_build_query(array_filter([
                     'keyword' => $keyword,
                     'role'    => $roleFilter,
                     'page'    => $i,
                 ]));
                 ?>
                 <li class="page-item <?= $i === $currentPage ? 'active' : '' ?>">
-                    <a class="page-link <?= $i === $currentPage ? 'bg-danger border-danger' : 'text-danger' ?>" href="<?= viewE($url) ?>"><?= $i ?></a>
+                    <a class="page-link <?= $i === $currentPage ? 'bg-danger border-danger' : 'text-danger' ?>" href="<?= SecurityHelper::e($url) ?>"><?= $i ?></a>
                 </li>
             <?php endfor; ?>
         </ul>

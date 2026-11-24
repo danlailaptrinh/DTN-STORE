@@ -1,10 +1,10 @@
 <?php
-
+use App\Helpers\SecurityHelper;
 ?>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h4 fw-bold mb-0">Chi tiết tài khoản #<?= (int) $targetUser['id'] ?></h1>
-    <a href="<?= viewUrl('/admin/users') ?>" class="btn btn-outline-secondary btn-sm">Quay lại danh sách</a>
+    <a href="<?= SecurityHelper::url('/admin/users') ?>" class="btn btn-outline-secondary btn-sm">Quay lại danh sách</a>
 </div>
 
 <div class="row g-4">
@@ -15,23 +15,23 @@
                 <table class="table table-borderless mb-0">
                     <tr>
                         <th class="ui-style-13 text-muted">Họ và tên:</th>
-                        <td class="fw-semibold"><?= viewE($targetUser['full_name']) ?></td>
+                        <td class="fw-semibold"><?= SecurityHelper::e($targetUser['full_name']) ?></td>
                     </tr>
                     <tr>
                         <th class="text-muted">Email:</th>
-                        <td><?= viewE($targetUser['email']) ?></td>
+                        <td><?= SecurityHelper::e($targetUser['email']) ?></td>
                     </tr>
                     <tr>
                         <th class="text-muted">Số điện thoại:</th>
-                        <td><?= viewE($targetUser['phone'] ?: 'Chưa cập nhật') ?></td>
+                        <td><?= SecurityHelper::e($targetUser['phone'] ?: 'Chưa cập nhật') ?></td>
                     </tr>
                     <tr>
                         <th class="text-muted">Địa chỉ:</th>
-                        <td><?= viewE($targetUser['address'] ?: 'Chưa cập nhật') ?></td>
+                        <td><?= SecurityHelper::e($targetUser['address'] ?: 'Chưa cập nhật') ?></td>
                     </tr>
                     <tr>
                         <th class="text-muted">Vai trò hiện tại:</th>
-                        <td><span class="badge bg-primary"><?= viewE(strtoupper($targetUser['role_name'])) ?></span></td>
+                        <td><span class="badge bg-primary"><?= SecurityHelper::e(strtoupper($targetUser['role_name'])) ?></span></td>
                     </tr>
                     <tr>
                         <th class="text-muted">Trạng thái:</th>
@@ -43,7 +43,7 @@
                     </tr>
                     <tr>
                         <th class="text-muted">Ngày tạo:</th>
-                        <td><?= viewE(date('d/m/Y H:i', strtotime($targetUser['created_at']))) ?></td>
+                        <td><?= SecurityHelper::e(date('d/m/Y H:i', strtotime($targetUser['created_at']))) ?></td>
                     </tr>
                 </table>
             </div>
@@ -55,8 +55,8 @@
             <div class="card-body p-4">
                 <h2 class="h6 fw-bold mb-3">Cập nhật phân quyền</h2>
                 <?php if ((int) $targetUser['id'] !== (int) $currentUser['id']): ?>
-                    <form action="<?= viewUrl('/admin/users/update-role') ?>" method="POST">
-                        <?= viewCsrfField() ?>
+                    <form action="<?= SecurityHelper::url('/admin/users/update-role') ?>" method="POST">
+                        <?= SecurityHelper::csrfField() ?>
                         <input type="hidden" name="user_id" value="<?= (int) $targetUser['id'] ?>">
 
                         <div class="mb-3">
@@ -64,7 +64,7 @@
                             <select name="role_id" class="form-select">
                                 <?php foreach ($roles as $r): ?>
                                     <option value="<?= (int) $r['id'] ?>" <?= (int) $targetUser['role_id'] === (int) $r['id'] ? 'selected' : '' ?>>
-                                        <?= viewE(strtoupper($r['name'])) ?> - <?= viewE($r['description']) ?>
+                                        <?= SecurityHelper::e(strtoupper($r['name'])) ?> - <?= SecurityHelper::e($r['description']) ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>

@@ -1,29 +1,29 @@
 <?php
-
+use App\Helpers\SecurityHelper;
 ?>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h4 fw-bold mb-0">Sửa biến thể: <?= viewE($product['name'] ?? '') ?></h1>
-    <a href="<?= viewUrl('/admin/products/' . (int) $variant['product_id'] . '/variants') ?>" class="btn btn-outline-secondary btn-sm">Quay lại</a>
+    <h1 class="h4 fw-bold mb-0">Sửa biến thể: <?= SecurityHelper::e($product['name'] ?? '') ?></h1>
+    <a href="<?= SecurityHelper::url('/admin/products/' . (int) $variant['product_id'] . '/variants') ?>" class="btn btn-outline-secondary btn-sm">Quay lại</a>
 </div>
 
 <div class="ui-style-11 card border-0 shadow-sm">
     <div class="card-body p-4">
-        <form action="<?= viewUrl('/admin/variants/update/' . (int) $variant['id']) ?>" method="POST">
-            <?= viewCsrfField() ?>
+        <form action="<?= SecurityHelper::url('/admin/variants/update/' . (int) $variant['id']) ?>" method="POST">
+            <?= SecurityHelper::csrfField() ?>
 
             <div class="row g-3 mb-3">
                 <div class="col-md-4">
                     <label class="form-label small fw-semibold">RAM <span class="text-danger">*</span></label>
-                    <input type="text" name="ram" class="form-control" value="<?= viewE($variant['ram']) ?>" required>
+                    <input type="text" name="ram" class="form-control" value="<?= SecurityHelper::e($variant['ram']) ?>" required>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label small fw-semibold">Dung lượng <span class="text-danger">*</span></label>
-                    <input type="text" name="storage" class="form-control" value="<?= viewE($variant['storage']) ?>" required>
+                    <input type="text" name="storage" class="form-control" value="<?= SecurityHelper::e($variant['storage']) ?>" required>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label small fw-semibold">Màu sắc <span class="text-danger">*</span></label>
-                    <input type="text" name="color" class="form-control" value="<?= viewE($variant['color']) ?>" required>
+                    <input type="text" name="color" class="form-control" value="<?= SecurityHelper::e($variant['color']) ?>" required>
                 </div>
             </div>
 

@@ -1,16 +1,16 @@
 <?php
-
+use App\Helpers\SecurityHelper;
 ?>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h4 fw-bold mb-0">Tạo tài khoản nhân viên / người dùng mới</h1>
-    <a href="<?= viewUrl('/admin/users') ?>" class="btn btn-outline-secondary btn-sm">Quay lại</a>
+    <a href="<?= SecurityHelper::url('/admin/users') ?>" class="btn btn-outline-secondary btn-sm">Quay lại</a>
 </div>
 
 <div class="ui-style-14 card border-0 shadow-sm">
     <div class="card-body p-4">
-        <form action="<?= viewUrl('/admin/users/store') ?>" method="POST">
-            <?= viewCsrfField() ?>
+        <form action="<?= SecurityHelper::url('/admin/users/store') ?>" method="POST">
+            <?= SecurityHelper::csrfField() ?>
 
             <div class="mb-3">
                 <label class="form-label small fw-semibold">Họ và tên <span class="text-danger">*</span></label>
@@ -43,7 +43,7 @@
                     <select name="role_id" class="form-select" required>
                         <?php foreach ($roles as $r): ?>
                             <option value="<?= (int) $r['id'] ?>" <?= $r['name'] === 'employee' ? 'selected' : '' ?>>
-                                <?= viewE(strtoupper($r['name'])) ?> - <?= viewE($r['description']) ?>
+                                <?= SecurityHelper::e(strtoupper($r['name'])) ?> - <?= SecurityHelper::e($r['description']) ?>
                             </option>
                         <?php endforeach; ?>
                     </select>

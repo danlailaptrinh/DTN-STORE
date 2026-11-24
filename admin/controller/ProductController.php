@@ -124,8 +124,7 @@ class ProductController
         $activeMenu = 'products';
 
         // Lấy thông tin người dùng hiện tại
-        $currentUser =
-            viewGetUser();
+        $currentUser = \App\Helpers\SessionHelper::getUser();
 
         // Nạp Layout
         require __DIR__ . '/../view/layout/header.php';
@@ -148,8 +147,7 @@ class ProductController
         $activeMenu = 'products';
 
         // Thông tin người dùng hiện tại
-        $currentUser =
-            viewGetUser();
+        $currentUser = \App\Helpers\SessionHelper::getUser();
 
         // Nạp layout chính thức
         require __DIR__ . '/../view/layout/header.php';
@@ -174,6 +172,40 @@ class ProductController
         if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], (string)($_POST['csrf_token'] ?? ''))) {
             http_response_code(403);
             exit('CSRF Token không hợp lệ');
+        }
+
+        // Chuẩn hóa dữ liệu đầu vào tương thích cả form giao diện và form MVC
+        if (empty($_POST['product_name']) && !empty($_POST['name'])) {
+            $_POST['product_name'] = $_POST['name'];
+        }
+        if (empty($_POST['brand']) && !empty($_POST['category_id'])) {
+            foreach ($this->productModel->getCategories() as $cat) {
+                if ((int)$cat['id'] === (int)$_POST['category_id']) {
+                    $_POST['brand'] = $cat['name'];
+                    break;
+                }
+            }
+        }
+        if (isset($_POST['status'])) {
+            if ($_POST['status'] === '1') $_POST['status'] = 'dang_ban';
+            elseif ($_POST['status'] === '0') $_POST['status'] = 'ngung_ban';
+        }
+        if (!empty($_POST['init_ram']) && is_string($_POST['init_ram'])) {
+            $digits = preg_replace('/\D/', '', $_POST['init_ram']);
+            if ($digits !== '') $_POST['init_ram'] = $digits;
+        }
+        if (!empty($_POST['init_storage']) && is_string($_POST['init_storage'])) {
+            $digits = preg_replace('/\D/', '', $_POST['init_storage']);
+            if ($digits !== '') $_POST['init_storage'] = $digits;
+        }
+        if (empty($_POST['init_sale_price']) && !empty($_POST['init_price'])) {
+            $_POST['init_sale_price'] = $_POST['init_price'];
+        }
+        if (empty($_POST['init_sku'])) {
+            $_POST['init_sku'] = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', (string)($_POST['product_name'] ?? 'PROD')), 0, 8)) . '-' . ($_POST['init_storage'] ?? '128') . '-' . strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', (string)($_POST['init_color'] ?? 'STD')), 0, 4));
+        }
+        if (!isset($_POST['init_stock']) || $_POST['init_stock'] === '') {
+            $_POST['init_stock'] = 10;
         }
 
         // Lấy dữ liệu sản phẩm
@@ -455,6 +487,21 @@ class ProductController
         if (!hash_equals($_SESSION['csrf_token']??'',(string)($_POST['csrf_token']??'')) || empty($_SESSION['csrf_token'])) {http_response_code(403);exit('CSRF không hợp lệ');}
         $old=$this->productModel->getById($id);
         if (!$old) {http_response_code(404);exit('Không tìm thấy sản phẩm');}
+        if (empty($_POST['product_name']) && !empty($_POST['name'])) {
+            $_POST['product_name'] = $_POST['name'];
+        }
+        if (empty($_POST['brand']) && !empty($_POST['category_id'])) {
+            foreach ($this->productModel->getCategories() as $cat) {
+                if ((int)$cat['id'] === (int)$_POST['category_id']) {
+                    $_POST['brand'] = $cat['name'];
+                    break;
+                }
+            }
+        }
+        if (isset($_POST['status'])) {
+            if ($_POST['status'] === '1') $_POST['status'] = 'dang_ban';
+            elseif ($_POST['status'] === '0') $_POST['status'] = 'ngung_ban';
+        }
         $data=[];
         foreach (['product_name','brand','description','screen','chip','promotion_label','status'] as $field) $data[$field]=trim((string)($_POST[$field]??''));
         $data['category_id']=filter_var($_POST['category_id']??null,FILTER_VALIDATE_INT);

@@ -1,5 +1,5 @@
 <?php
-
+use App\Helpers\SecurityHelper;
 ?>
 
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
@@ -10,7 +10,7 @@
 </div>
 
 <!-- BỘ LỌC TÌM KIẾM ĐƠN HÀNG -->
-<form action="<?= viewUrl('/admin/orders') ?>" method="GET" class="card border-0 shadow-sm mb-4">
+<form action="<?= SecurityHelper::url('/admin/orders') ?>" method="GET" class="card border-0 shadow-sm mb-4">
     <div class="card-body">
         <div class="row g-3 align-items-end">
             <div class="col-md-3">
@@ -20,7 +20,7 @@
                     name="keyword"
                     class="form-control"
                     placeholder="Mã đơn, tên hoặc SĐT nhận..."
-                    value="<?= viewE($filters['keyword'] ?? '') ?>"
+                    value="<?= SecurityHelper::e($filters['keyword'] ?? '') ?>"
                 >
             </div>
 
@@ -57,7 +57,7 @@
 
             <div class="col-md-2 d-flex gap-2">
                 <button type="submit" class="btn btn-dtd w-100"><i class="bi bi-search me-1"></i>Lọc</button>
-                <a href="<?= viewUrl('/admin/orders') ?>" class="btn btn-outline-secondary" title="Đặt lại">
+                <a href="<?= SecurityHelper::url('/admin/orders') ?>" class="btn btn-outline-secondary" title="Đặt lại">
                     <i class="bi bi-arrow-clockwise"></i>
                 </a>
             </div>
@@ -85,42 +85,42 @@
                 <?php if (!empty($orders)): ?>
                     <?php foreach ($orders as $order): ?>
                         <?php
-                        $orderBadge   = viewOrderStatusBadge($order['status'] ?? 'pending');
-                        $paymentBadge = viewPaymentStatusBadge($order['payment_status'] ?? 'unpaid');
+                        $orderBadge   = SecurityHelper::orderStatusBadge($order['status'] ?? 'pending');
+                        $paymentBadge = SecurityHelper::paymentStatusBadge($order['payment_status'] ?? 'unpaid');
                         $methodText   = ($order['payment_method'] ?? 'cod') === 'qr_simulation' ? 'QR mô phỏng' : 'COD';
                         ?>
                         <tr>
-                            <td class="fw-bold text-danger">#<?= viewE($order['order_code']) ?></td>
+                            <td class="fw-bold text-danger">#<?= SecurityHelper::e($order['order_code']) ?></td>
                             <td>
-                                <div class="fw-semibold"><?= viewE($order['receiver_name']) ?></div>
-                                <div class="small text-muted"><?= viewE($order['receiver_phone']) ?></div>
+                                <div class="fw-semibold"><?= SecurityHelper::e($order['receiver_name']) ?></div>
+                                <div class="small text-muted"><?= SecurityHelper::e($order['receiver_phone']) ?></div>
                             </td>
-                            <td class="text-end fw-bold text-danger"><?= viewPrice($order['total_amount']) ?></td>
+                            <td class="text-end fw-bold text-danger"><?= SecurityHelper::formatPrice($order['total_amount']) ?></td>
                             <td>
-                                <div class="small text-muted mb-1"><?= viewE($methodText) ?></div>
-                                <span class="badge <?= viewE($paymentBadge['class']) ?>">
-                                    <?= viewE($paymentBadge['label']) ?>
+                                <div class="small text-muted mb-1"><?= SecurityHelper::e($methodText) ?></div>
+                                <span class="badge <?= SecurityHelper::e($paymentBadge['class']) ?>">
+                                    <?= SecurityHelper::e($paymentBadge['label']) ?>
                                 </span>
                             </td>
                             <td>
-                                <span class="badge <?= viewE($orderBadge['class']) ?>">
-                                    <?= viewE($orderBadge['label']) ?>
+                                <span class="badge <?= SecurityHelper::e($orderBadge['class']) ?>">
+                                    <?= SecurityHelper::e($orderBadge['label']) ?>
                                 </span>
                             </td>
                             <td>
                                 <?php if (!empty($order['active_employee_name'])): ?>
                                     <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">
-                                        <i class="bi bi-person-check me-1"></i><?= viewE($order['active_employee_name']) ?>
+                                        <i class="bi bi-person-check me-1"></i><?= SecurityHelper::e($order['active_employee_name']) ?>
                                     </span>
                                 <?php else: ?>
                                     <span class="badge bg-light text-secondary border">Chưa phân công</span>
                                 <?php endif; ?>
                             </td>
                             <td class="small text-muted">
-                                <?= viewE(date('d/m/Y H:i', strtotime($order['created_at']))) ?>
+                                <?= SecurityHelper::e(date('d/m/Y H:i', strtotime($order['created_at']))) ?>
                             </td>
                             <td class="text-end">
-                                <a href="<?= viewUrl('/admin/orders/' . (int) $order['id']) ?>" class="btn btn-sm btn-outline-dark">
+                                <a href="<?= SecurityHelper::url('/admin/orders/' . (int) $order['id']) ?>" class="btn btn-sm btn-outline-dark">
                                     <i class="bi bi-eye me-1"></i>Chi tiết
                                 </a>
                             </td>
@@ -139,7 +139,7 @@
         <ul class="pagination">
             <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                 <?php
-                $url = viewUrl('/admin/orders') . '?' . http_build_query(array_filter([
+                $url = SecurityHelper::url('/admin/orders') . '?' . http_build_query(array_filter([
                     'keyword'        => $filters['keyword'] ?? '',
                     'status'         => $filters['status'] ?? '',
                     'payment_status' => $filters['payment_status'] ?? '',
@@ -148,7 +148,7 @@
                 ], fn($v) => $v !== '' && $v !== null));
                 ?>
                 <li class="page-item <?= $i === $currentPage ? 'active' : '' ?>">
-                    <a class="page-link <?= $i === $currentPage ? 'bg-danger border-danger' : 'text-danger' ?>" href="<?= viewE($url) ?>"><?= $i ?></a>
+                    <a class="page-link <?= $i === $currentPage ? 'bg-danger border-danger' : 'text-danger' ?>" href="<?= SecurityHelper::e($url) ?>"><?= $i ?></a>
                 </li>
             <?php endfor; ?>
         </ul>

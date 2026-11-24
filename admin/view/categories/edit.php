@@ -1,25 +1,25 @@
 <?php
-
+use App\Helpers\SecurityHelper;
 ?>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h4 fw-bold mb-0">Sửa danh mục: <?= viewE($category['name']) ?></h1>
-    <a href="<?= viewUrl('/admin/categories') ?>" class="btn btn-outline-secondary btn-sm">Quay lại</a>
+    <h1 class="h4 fw-bold mb-0">Sửa danh mục: <?= SecurityHelper::e($category['name']) ?></h1>
+    <a href="<?= SecurityHelper::url('/admin/categories') ?>" class="btn btn-outline-secondary btn-sm">Quay lại</a>
 </div>
 
 <div class="ui-style-11 card border-0 shadow-sm">
     <div class="card-body p-4">
-        <form action="<?= viewUrl('/admin/categories/update/' . (int) $category['id']) ?>" method="POST">
-            <?= viewCsrfField() ?>
+        <form action="<?= SecurityHelper::url('/admin/categories/update/' . (int) $category['id']) ?>" method="POST">
+            <?= SecurityHelper::csrfField() ?>
 
             <div class="mb-3">
                 <label class="form-label small fw-semibold">Tên danh mục / Thương hiệu <span class="text-danger">*</span></label>
-                <input type="text" name="name" class="form-control" value="<?= viewE($category['name']) ?>" required>
+                <input type="text" name="name" class="form-control" value="<?= SecurityHelper::e($category['name']) ?>" required>
             </div>
 
             <div class="mb-3">
                 <label class="form-label small fw-semibold">Mô tả</label>
-                <textarea name="description" class="form-control" rows="3"><?= viewE($category['description'] ?? '') ?></textarea>
+                <textarea name="description" class="form-control" rows="3"><?= SecurityHelper::e($category['description'] ?? '') ?></textarea>
             </div>
 
             <div class="mb-4">

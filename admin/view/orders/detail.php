@@ -1,7 +1,8 @@
 <?php
+use App\Helpers\SecurityHelper;
 
-$orderBadge   = viewOrderStatusBadge($order['status'] ?? 'pending');
-$paymentBadge = viewPaymentStatusBadge($order['payment_status'] ?? 'unpaid');
+$orderBadge   = SecurityHelper::orderStatusBadge($order['status'] ?? 'pending');
+$paymentBadge = SecurityHelper::paymentStatusBadge($order['payment_status'] ?? 'unpaid');
 $methodLabel  = ($order['payment_method'] ?? 'cod') === 'qr_simulation'
     ? 'Chuyển khoản QR mô phỏng'
     : 'Thanh toán khi nhận hàng (COD)';
@@ -27,23 +28,23 @@ $canAssign           = !in_array($order['status'], ['delivered', 'cancelled'], t
 
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
     <div>
-        <a href="<?= viewUrl('/admin/orders') ?>" class="text-decoration-none text-muted small">
+        <a href="<?= SecurityHelper::url('/admin/orders') ?>" class="text-decoration-none text-muted small">
             <i class="bi bi-arrow-left me-1"></i>Quay lại danh sách đơn hàng
         </a>
         <h1 class="h4 fw-bold mb-0 mt-1">
-            Chi tiết đơn hàng #<?= viewE($order['order_code']) ?>
+            Chi tiết đơn hàng #<?= SecurityHelper::e($order['order_code']) ?>
         </h1>
         <div class="small text-muted">
-            Ngày đặt: <?= viewE(date('d/m/Y H:i:s', strtotime($order['created_at']))) ?>
+            Ngày đặt: <?= SecurityHelper::e(date('d/m/Y H:i:s', strtotime($order['created_at']))) ?>
         </div>
     </div>
 
     <div class="d-flex flex-wrap gap-2 align-items-center">
-        <span class="badge <?= viewE($orderBadge['class']) ?> px-3 py-2">
-            Đơn hàng: <?= viewE($orderBadge['label']) ?>
+        <span class="badge <?= SecurityHelper::e($orderBadge['class']) ?> px-3 py-2">
+            Đơn hàng: <?= SecurityHelper::e($orderBadge['label']) ?>
         </span>
-        <span class="badge <?= viewE($paymentBadge['class']) ?> px-3 py-2">
-            Thanh toán: <?= viewE($paymentBadge['label']) ?>
+        <span class="badge <?= SecurityHelper::e($paymentBadge['class']) ?> px-3 py-2">
+            Thanh toán: <?= SecurityHelper::e($paymentBadge['label']) ?>
         </span>
     </div>
 </div>
@@ -60,22 +61,22 @@ $canAssign           = !in_array($order['status'], ['delivered', 'cancelled'], t
                 <div class="row g-3 small">
                     <div class="col-md-6">
                         <div class="text-muted">Tài khoản đặt hàng</div>
-                        <div class="fw-semibold"><?= viewE($order['customer_name']) ?></div>
-                        <div class="text-muted"><?= viewE($order['customer_email']) ?></div>
+                        <div class="fw-semibold"><?= SecurityHelper::e($order['customer_name']) ?></div>
+                        <div class="text-muted"><?= SecurityHelper::e($order['customer_email']) ?></div>
                     </div>
                     <div class="col-md-6">
                         <div class="text-muted">Người nhận hàng</div>
-                        <div class="fw-semibold"><?= viewE($order['receiver_name']) ?></div>
-                        <div>SĐT: <strong><?= viewE($order['receiver_phone']) ?></strong></div>
+                        <div class="fw-semibold"><?= SecurityHelper::e($order['receiver_name']) ?></div>
+                        <div>SĐT: <strong><?= SecurityHelper::e($order['receiver_phone']) ?></strong></div>
                     </div>
                     <div class="col-12">
                         <div class="text-muted">Địa chỉ giao hàng</div>
-                        <div class="fw-semibold"><?= viewE($order['shipping_address']) ?></div>
+                        <div class="fw-semibold"><?= SecurityHelper::e($order['shipping_address']) ?></div>
                     </div>
                     <?php if (!empty($order['note'])): ?>
                         <div class="col-12">
                             <div class="text-muted">Ghi chú của khách hàng</div>
-                            <div class="bg-light rounded p-2"><?= viewE($order['note']) ?></div>
+                            <div class="bg-light rounded p-2"><?= SecurityHelper::e($order['note']) ?></div>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -103,32 +104,32 @@ $canAssign           = !in_array($order['status'], ['delivered', 'cancelled'], t
                                 <td>
                                     <div class="d-flex align-items-center gap-3">
                                         <img
-                                            src="<?= viewImage($item['product_image']) ?>"
-                                            alt="<?= viewE($item['product_name']) ?>"
+                                            src="<?= SecurityHelper::productImage($item['product_image']) ?>"
+                                            alt="<?= SecurityHelper::e($item['product_name']) ?>"
                                             class="border rounded p-1 bg-white"
                                             style="width: 52px; height: 52px; object-fit: contain;"
                                         >
                                         <div>
-                                            <div class="fw-semibold"><?= viewE($item['product_name']) ?></div>
+                                            <div class="fw-semibold"><?= SecurityHelper::e($item['product_name']) ?></div>
                                             <div class="small text-muted">
-                                                <?= viewE($item['category_name']) ?> •
-                                                RAM <?= viewE($item['ram']) ?> •
-                                                <?= viewE($item['storage']) ?> •
-                                                Màu <?= viewE($item['color']) ?>
+                                                <?= SecurityHelper::e($item['category_name']) ?> •
+                                                RAM <?= SecurityHelper::e($item['ram']) ?> •
+                                                <?= SecurityHelper::e($item['storage']) ?> •
+                                                Màu <?= SecurityHelper::e($item['color']) ?>
                                             </div>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="text-end"><?= viewPrice($item['unit_price']) ?></td>
+                                <td class="text-end"><?= SecurityHelper::formatPrice($item['unit_price']) ?></td>
                                 <td class="text-center"><?= (int) $item['quantity'] ?></td>
-                                <td class="text-end fw-bold text-danger"><?= viewPrice($item['subtotal']) ?></td>
+                                <td class="text-end fw-bold text-danger"><?= SecurityHelper::formatPrice($item['subtotal']) ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
                     <tfoot class="table-light">
                         <tr>
                             <td colspan="3" class="text-end fw-bold">Tổng thanh toán:</td>
-                            <td class="text-end fs-5 fw-bold text-danger"><?= viewPrice($order['total_amount']) ?></td>
+                            <td class="text-end fs-5 fw-bold text-danger"><?= SecurityHelper::formatPrice($order['total_amount']) ?></td>
                         </tr>
                     </tfoot>
                 </table>
@@ -158,15 +159,15 @@ $canAssign           = !in_array($order['status'], ['delivered', 'cancelled'], t
                             <?php foreach ($assignmentHistory as $asg): ?>
                                 <tr>
                                     <td>
-                                        <div class="fw-semibold"><?= viewE($asg['employee_name']) ?></div>
-                                        <div class="ui-style-12 text-muted"><?= viewE($asg['employee_email']) ?></div>
+                                        <div class="fw-semibold"><?= SecurityHelper::e($asg['employee_name']) ?></div>
+                                        <div class="ui-style-12 text-muted"><?= SecurityHelper::e($asg['employee_email']) ?></div>
                                     </td>
-                                    <td><?= viewE($asg['assigned_by_name']) ?></td>
-                                    <td><?= viewE($asg['note'] ?: '-') ?></td>
-                                    <td><?= viewE(date('d/m/Y H:i', strtotime($asg['assigned_at']))) ?></td>
+                                    <td><?= SecurityHelper::e($asg['assigned_by_name']) ?></td>
+                                    <td><?= SecurityHelper::e($asg['note'] ?: '-') ?></td>
+                                    <td><?= SecurityHelper::e(date('d/m/Y H:i', strtotime($asg['assigned_at']))) ?></td>
                                     <td>
                                         <?= !empty($asg['unassigned_at'])
-                                            ? viewE(date('d/m/Y H:i', strtotime($asg['unassigned_at'])))
+                                            ? SecurityHelper::e(date('d/m/Y H:i', strtotime($asg['unassigned_at'])))
                                             : '-' ?>
                                     </td>
                                     <td>
@@ -197,20 +198,20 @@ $canAssign           = !in_array($order['status'], ['delivered', 'cancelled'], t
             <div class="card-body">
                 <div class="mb-3 small">
                     Trạng thái hiện tại:
-                    <span class="badge <?= viewE($orderBadge['class']) ?> ms-1">
-                        <?= viewE($orderBadge['label']) ?>
+                    <span class="badge <?= SecurityHelper::e($orderBadge['class']) ?> ms-1">
+                        <?= SecurityHelper::e($orderBadge['label']) ?>
                     </span>
                 </div>
 
                 <?php if (!empty($allowedNextStatuses)): ?>
-                    <form action="<?= viewUrl('/admin/orders/' . (int) $order['id'] . '/status') ?>" method="POST">
-                        <?= viewCsrfField() ?>
+                    <form action="<?= SecurityHelper::url('/admin/orders/' . (int) $order['id'] . '/status') ?>" method="POST">
+                        <?= SecurityHelper::csrfField() ?>
                         <div class="mb-3">
                             <label class="form-label small fw-semibold">Chuyển sang trạng thái</label>
                             <select name="status" class="form-select">
                                 <?php foreach ($allowedNextStatuses as $st): ?>
-                                    <option value="<?= viewE($st) ?>">
-                                        <?= viewE($statusLabels[$st] ?? $st) ?>
+                                    <option value="<?= SecurityHelper::e($st) ?>">
+                                        <?= SecurityHelper::e($statusLabels[$st] ?? $st) ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -221,7 +222,7 @@ $canAssign           = !in_array($order['status'], ['delivered', 'cancelled'], t
                     </form>
                 <?php else: ?>
                     <div class="alert alert-light border small mb-0">
-                        Đơn hàng đang ở trạng thái cuối (<strong><?= viewE($orderBadge['label']) ?></strong>), không thể chuyển tiếp.
+                        Đơn hàng đang ở trạng thái cuối (<strong><?= SecurityHelper::e($orderBadge['label']) ?></strong>), không thể chuyển tiếp.
                     </div>
                 <?php endif; ?>
             </div>
@@ -233,27 +234,27 @@ $canAssign           = !in_array($order['status'], ['delivered', 'cancelled'], t
                 <h2 class="h6 fw-bold mb-0"><i class="bi bi-cash-stack text-danger me-2"></i>2. Trạng thái thanh toán</h2>
             </div>
             <div class="card-body">
-                <div class="small mb-2"><strong>Phương thức:</strong> <?= viewE($methodLabel) ?></div>
+                <div class="small mb-2"><strong>Phương thức:</strong> <?= SecurityHelper::e($methodLabel) ?></div>
                 <div class="small mb-2">
                     <strong>Trạng thái:</strong>
-                    <span class="badge <?= viewE($paymentBadge['class']) ?> ms-1">
-                        <?= viewE($paymentBadge['label']) ?>
+                    <span class="badge <?= SecurityHelper::e($paymentBadge['class']) ?> ms-1">
+                        <?= SecurityHelper::e($paymentBadge['label']) ?>
                     </span>
                 </div>
                 <?php if (!empty($order['transfer_content'])): ?>
                     <div class="small mb-2">
                         <strong>Nội dung CK:</strong>
-                        <span class="font-monospace"><?= viewE($order['transfer_content']) ?></span>
+                        <span class="font-monospace"><?= SecurityHelper::e($order['transfer_content']) ?></span>
                     </div>
                 <?php endif; ?>
                 <?php if (!empty($order['payment_confirmed_at'])): ?>
                     <div class="small mb-2">
                         <strong>Xác nhận lúc:</strong>
-                        <?= viewE(date('d/m/Y H:i:s', strtotime($order['payment_confirmed_at']))) ?>
+                        <?= SecurityHelper::e(date('d/m/Y H:i:s', strtotime($order['payment_confirmed_at']))) ?>
                     </div>
                 <?php endif; ?>
                 <?php if (!empty($order['payment_note'])): ?>
-                    <div class="small text-muted mb-3"><?= viewE($order['payment_note']) ?></div>
+                    <div class="small text-muted mb-3"><?= SecurityHelper::e($order['payment_note']) ?></div>
                 <?php endif; ?>
 
                 <?php if ($order['payment_method'] === 'cod'): ?>
@@ -262,8 +263,8 @@ $canAssign           = !in_array($order['status'], ['delivered', 'cancelled'], t
                             Đơn hàng đã hủy nên không thể xác nhận thu tiền COD.
                         </div>
                     <?php else: ?>
-                        <form action="<?= viewUrl('/admin/orders/' . (int) $order['id'] . '/payment') ?>" method="POST">
-                            <?= viewCsrfField() ?>
+                        <form action="<?= SecurityHelper::url('/admin/orders/' . (int) $order['id'] . '/payment') ?>" method="POST">
+                            <?= SecurityHelper::csrfField() ?>
                             <div class="mb-3">
                                 <label class="form-label small fw-semibold">Cập nhật thanh toán COD</label>
                                 <select name="payment_status" class="form-select">
@@ -295,8 +296,8 @@ $canAssign           = !in_array($order['status'], ['delivered', 'cancelled'], t
                     <strong>Đang phụ trách:</strong>
                     <?php if (!empty($order['active_employee_name'])): ?>
                         <div class="mt-1 p-2 rounded bg-light border">
-                            <div class="fw-semibold text-primary"><?= viewE($order['active_employee_name']) ?></div>
-                            <div class="ui-style-5 text-muted"><?= viewE($order['active_employee_email']) ?></div>
+                            <div class="fw-semibold text-primary"><?= SecurityHelper::e($order['active_employee_name']) ?></div>
+                            <div class="ui-style-5 text-muted"><?= SecurityHelper::e($order['active_employee_email']) ?></div>
                         </div>
                     <?php else: ?>
                         <span class="badge bg-secondary ms-1">Chưa phân công</span>
@@ -305,15 +306,15 @@ $canAssign           = !in_array($order['status'], ['delivered', 'cancelled'], t
 
                 <?php if ($canAssign): ?>
                     <?php if (!empty($employees)): ?>
-                        <form action="<?= viewUrl('/admin/orders/' . (int) $order['id'] . '/assign') ?>" method="POST">
-                            <?= viewCsrfField() ?>
+                        <form action="<?= SecurityHelper::url('/admin/orders/' . (int) $order['id'] . '/assign') ?>" method="POST">
+                            <?= SecurityHelper::csrfField() ?>
                             <div class="mb-3">
                                 <label class="form-label small fw-semibold">Chọn nhân viên phụ trách</label>
                                 <select name="employee_id" class="form-select" required>
                                     <option value="">-- Chọn nhân viên --</option>
                                     <?php foreach ($employees as $emp): ?>
                                         <option value="<?= (int) $emp['id'] ?>" <?= (int) ($order['active_employee_id'] ?? 0) === (int) $emp['id'] ? 'selected' : '' ?>>
-                                            <?= viewE($emp['full_name']) ?> (<?= viewE($emp['email']) ?>)
+                                            <?= SecurityHelper::e($emp['full_name']) ?> (<?= SecurityHelper::e($emp['email']) ?>)
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
