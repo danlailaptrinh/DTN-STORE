@@ -63,11 +63,11 @@ class SecurityHelper
     /**
      * Tạo đường dẫn tới file tĩnh trong public/assets
      */
-    public static function asset(string $path): string { return $GLOBALS['prefix'].'assets/'.ltrim($path,'/'); }
+    public static function asset(string $path): string { return '/assets/'.ltrim($path,'/'); }
     /**
      * Lấy đường dẫn ảnh sản phẩm an toàn (fallback về ảnh mặc định nếu file chưa tồn tại)
      */
-    public static function productImage(?string $path): string { return $GLOBALS['prefix'].($path && file_exists(dirname(__DIR__).'/'.$path)?$path:'assets/images/no-image.svg'); }
+    public static function productImage(?string $path): string { return '/'.($path && file_exists(dirname(__DIR__).'/'.$path)?$path:'assets/images/no-image.svg'); }
     /**
      * Định dạng tiền tệ VNĐ
      */
