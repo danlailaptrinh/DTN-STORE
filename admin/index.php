@@ -14,6 +14,7 @@ if (!defined('APP_NAME')) {
 
 $route = $_GET['route'] ?? '/admin';
 
+
 if (!is_string($route) || strlen($route) > 200) {
     http_response_code(400);
     exit('Route không hợp lệ');
@@ -62,6 +63,63 @@ if (preg_match('~^/admin/products(?:$|/(?:create|store|edit/[1-9][0-9]*|update/[
     exit;
 }
 
+// Route sửa biến thể sản phẩm
+if (preg_match('~^/admin/variants/edit/([1-9][0-9]*)$~', $route, $m)) {
+
+    if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        http_response_code(405);
+        exit('Chỉ chấp nhận GET');
+    }
+
+    require_once __DIR__ . '/../config/pdo.php';
+    require_once __DIR__ . '/controller/ProductVariantController.php';
+
+    $controller = new ProductVariantController($pdo);
+
+    $controller->edit((int) $m[1]);
+
+    exit;
+}
+
+// Route cập nhật biến thể sản phẩm
+if (preg_match('~^/admin/variants/update/([1-9][0-9]*)$~', $route, $m)) {
+
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
+        exit('Chỉ chấp nhận POST');
+    }
+
+    require_once __DIR__ . '/../config/pdo.php';
+    require_once __DIR__ . '/controller/ProductVariantController.php';
+    $controller = new ProductVariantController($pdo);
+    $controller->update((int) $m[1]);
+    exit;
+}
+// Route xóa biến thể sản phẩm
+if ($route === '/admin/variants/delete') {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
+        exit('Chỉ chấp nhận POST');
+    }
+    require_once __DIR__ . '/../config/pdo.php';
+    require_once __DIR__ . '/controller/ProductVariantController.php';
+    $controller = new ProductVariantController($pdo);
+    $controller->delete();
+    exit;
+}
+// Route xóa sản phẩm
+if ($route === '/admin/products/delete') {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
+        exit('Chỉ chấp nhận POST');
+    }
+    require_once __DIR__ . '/../config/pdo.php';
+    require_once __DIR__ . '/controller/ProductController.php';
+    $controller = new ProductController($pdo);
+    $controller->delete();
+    exit;
+}
+
 // 3. Các route Admin đã khai báo theo cấu trúc dự án nhưng chưa triển khai Controller/Model
 $currentUser = SessionHelper::getUser();
 $unimplementedMeta = null;
@@ -76,10 +134,6 @@ if ($route === '/admin' || $route === '/admin/') {
     $unimplementedMeta = ['menu' => 'users', 'title' => 'Người dùng & Phân quyền', 'desc' => 'UserController chưa được triển khai nghiệp vụ.'];
 } elseif (preg_match('~^/admin/reviews(?:$|/toggle)$~', $route)) {
     $unimplementedMeta = ['menu' => 'reviews', 'title' => 'Đánh giá & Bình luận', 'desc' => 'ReviewController chưa được triển khai nghiệp vụ.'];
-} elseif (preg_match('~^/admin/products/delete$~', $route)
-    || preg_match('~^/admin/variants/(?:(?:edit|update)/[1-9][0-9]*|delete)$~', $route)
-) {
-    $unimplementedMeta = ['menu' => 'products', 'title' => 'Quản lý sản phẩm & biến thể', 'desc' => 'Chức năng mở rộng này chưa được triển khai nghiệp vụ trong Controller.'];
 }
 
 if ($unimplementedMeta !== null) {
@@ -87,7 +141,7 @@ if ($unimplementedMeta !== null) {
     $activeMenu = $unimplementedMeta['menu'];
     $pageTitle = $unimplementedMeta['title'] . ' | ' . APP_NAME;
     require __DIR__ . '/view/layout/header.php';
-    ?>
+?>
     <div class="card border-0 shadow-sm my-3">
         <div class="card-body p-4 p-md-5 text-center">
             <span class="badge bg-warning text-dark mb-3 px-3 py-2">Chức năng đang phát triển</span>
@@ -104,7 +158,7 @@ if ($unimplementedMeta !== null) {
             </div>
         </div>
     </div>
-    <?php
+<?php
     require __DIR__ . '/view/layout/footer.php';
     exit;
 }

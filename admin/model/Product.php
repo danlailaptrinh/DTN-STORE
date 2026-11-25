@@ -190,13 +190,47 @@ END AS status,
         }
     }
 
-    public function update($id, array $data): void {
+    public function update($id, array $data): void
+    {
         $sql = "UPDATE products SET product_name=?, category_id=?, brand=?, description=?, screen=?, chip=?, list_price=?, old_price=?, promotion_label=?, status=?, image_list=? WHERE product_id=?";
-        $s=$this->pdo->prepare($sql);
-        $s->execute([$data['product_name'],$data['category_id'],$data['brand'],$data['description'],$data['screen'],$data['chip'],$data['list_price'],$data['old_price'],$data['promotion_label'],$data['status'],$data['image_list'],$id]);
+        $s = $this->pdo->prepare($sql);
+        $s->execute([$data['product_name'], $data['category_id'], $data['brand'], $data['description'], $data['screen'], $data['chip'], $data['list_price'], $data['old_price'], $data['promotion_label'], $data['status'], $data['image_list'], $id]);
     }
-    public function getVariants($productId): array {
-        $s=$this->pdo->prepare('SELECT * FROM product_variants WHERE product_id=? ORDER BY variant_id DESC');
-        $s->execute([$productId]); return $s->fetchAll(PDO::FETCH_ASSOC);
+    public function getVariants($productId): array
+    {
+        $s = $this->pdo->prepare('SELECT * FROM product_variants WHERE product_id=? ORDER BY variant_id DESC');
+        $s->execute([$productId]);
+        return $s->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function hasOrders(int $id): bool
+    {
+        $sql = "SELECT COUNT(*)
+            FROM order_details od
+            INNER JOIN product_variants pv
+                ON od.variant_id = pv.variant_id
+            WHERE pv.product_id = ?";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$id]);
+        return (int)$stmt->fetchColumn() > 0;
+    }
+
+    public function deleteVariants(int $id): bool
+    {
+        $sql = "DELETE FROM product_variants
+            WHERE product_id = ?";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([$id]);
+    }
+    public function delete(int $id): bool
+    {
+        $sql = "DELETE FROM products
+            WHERE product_id = ?";
+
+        $stmt = $this->pdo->prepare($sql);
+
+        $stmt->execute([$id]);
+
+        return $stmt->rowCount() > 0;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 use App\Helpers\SecurityHelper;
 
 $productId = (int)($product['product_id'] ?? $product['id'] ?? 0);
@@ -30,6 +31,48 @@ $productId = (int)($product['product_id'] ?? $product['id'] ?? 0);
     </div>
 <?php endif; ?>
 
+<?php if (($_GET['success'] ?? '') === 'variant_updated'): ?>
+    <div class="alert alert-success alert-dismissible fade show shadow-sm mb-4" role="alert">
+        Đã cập nhật biến thể thành công!
+        <button type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Đóng">
+        </button>
+    </div>
+<?php endif; ?>
+
+<?php if (($_GET['success'] ?? '') === 'variant_deleted'): ?>
+    <div class="alert alert-success alert-dismissible fade show shadow-sm mb-4"
+        role="alert">
+        Đã xóa biến thể thành công!
+        <button type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Đóng">
+        </button>
+    </div>
+<?php endif; ?>
+
+<?php
+$errorMessages = [
+    'last_variant' => 'Không thể xóa biến thể cuối cùng của sản phẩm.',
+    'variant_has_orders' => 'Không thể xóa biến thể đã phát sinh đơn hàng.',
+    'delete_failed' => 'Xóa biến thể thất bại. Vui lòng thử lại.'
+];
+$error = $_GET['error'] ?? '';
+?>
+<?php if (is_string($error) && isset($errorMessages[$error])): ?>
+    <div class="alert alert-danger alert-dismissible fade show shadow-sm mb-4"
+        role="alert">
+        <?= SecurityHelper::e($errorMessages[$error]) ?>
+        <button type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Đóng">
+        </button>
+    </div>
+<?php endif; ?>
 <div class="row g-4">
     <!-- FORM THÊM BIẾN THỂ MỚI -->
     <div class="col-lg-4">
@@ -120,12 +163,27 @@ $productId = (int)($product['product_id'] ?? $product['id'] ?? 0);
                                             <?= ((int) ($v['is_on_sale'] ?? 0) === 1) ? '<span class="badge bg-warning text-dark">KM</span>' : 'Thường' ?>
                                         </td>
                                         <td class="text-end text-nowrap">
-                                            <button type="button" class="btn btn-sm btn-outline-primary" disabled title="Chức năng sửa biến thể đang phát triển">
+                                            <a href="<?= SecurityHelper::url('/admin/variants/edit/' . (int)$v['variant_id']) ?>"
+                                                class="btn btn-sm btn-outline-primary">
                                                 <i class="bi bi-pencil"></i> Sửa
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-outline-danger" disabled title="Chức năng xóa biến thể đang phát triển">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
+                                            </a>
+                                            <form method="POST"
+                                                action="<?= SecurityHelper::url('/admin/variants/delete') ?>"
+                                                class="d-inline"
+                                                onsubmit="return confirm('Bạn có chắc chắn muốn xóa biến thể này không?');">
+
+                                                <?= SecurityHelper::csrfField() ?>
+
+                                                <input type="hidden"
+                                                    name="variant_id"
+                                                    value="<?= (int)$v['variant_id'] ?>">
+
+                                                <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-trash"></i> Xóa
+                                                </button>
+
+                                            </form>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

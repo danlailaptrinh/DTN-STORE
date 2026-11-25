@@ -5,9 +5,11 @@ require_once __DIR__ . '/ProductInputValidation.php';
 class ProductController
 {
     private $productModel;
+    private $pdo;
 
     public function __construct($pdo)
     {
+        $this->pdo = $pdo;
         $this->productModel = new Product($pdo);
     }
 
@@ -471,22 +473,37 @@ class ProductController
         }
     }
 
-    public function edit(int $id): void {
-        $product=$this->productModel->getById($id);
-        if (!$product) { http_response_code(404); exit('Không tìm thấy sản phẩm'); }
-        $categories=$this->productModel->getCategories();
-        $images=json_decode($product['image_list']??'[]',true);
-        $images=is_array($images)?($images['anh_san_pham']??$images):[];
-        $pageTitle='Sửa sản phẩm | DTD STORE'; $activeMenu='products';
-        require __DIR__.'/../view/layout/header.php';
-        require __DIR__.'/../view/product/edit.php';
-        require __DIR__.'/../view/layout/footer.php';
+    public function edit(int $id): void
+    {
+        $product = $this->productModel->getById($id);
+        if (!$product) {
+            http_response_code(404);
+            exit('Không tìm thấy sản phẩm');
+        }
+        $categories = $this->productModel->getCategories();
+        $images = json_decode($product['image_list'] ?? '[]', true);
+        $images = is_array($images) ? ($images['anh_san_pham'] ?? $images) : [];
+        $pageTitle = 'Sửa sản phẩm | DTD STORE';
+        $activeMenu = 'products';
+        require __DIR__ . '/../view/layout/header.php';
+        require __DIR__ . '/../view/product/edit.php';
+        require __DIR__ . '/../view/layout/footer.php';
     }
-    public function update(int $id): void {
-        if ($_SERVER['REQUEST_METHOD']!=='POST') {http_response_code(405);exit('Chỉ cho phép POST');}
-        if (!hash_equals($_SESSION['csrf_token']??'',(string)($_POST['csrf_token']??'')) || empty($_SESSION['csrf_token'])) {http_response_code(403);exit('CSRF không hợp lệ');}
-        $old=$this->productModel->getById($id);
-        if (!$old) {http_response_code(404);exit('Không tìm thấy sản phẩm');}
+    public function update(int $id): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            exit('Chỉ cho phép POST');
+        }
+        if (!hash_equals($_SESSION['csrf_token'] ?? '', (string)($_POST['csrf_token'] ?? '')) || empty($_SESSION['csrf_token'])) {
+            http_response_code(403);
+            exit('CSRF không hợp lệ');
+        }
+        $old = $this->productModel->getById($id);
+        if (!$old) {
+            http_response_code(404);
+            exit('Không tìm thấy sản phẩm');
+        }
         if (empty($_POST['product_name']) && !empty($_POST['name'])) {
             $_POST['product_name'] = $_POST['name'];
         }
@@ -494,43 +511,71 @@ class ProductController
             if ($_POST['status'] === '1') $_POST['status'] = 'dang_ban';
             elseif ($_POST['status'] === '0') $_POST['status'] = 'ngung_ban';
         }
-        $data=[];
-        foreach (['product_name','brand','description','screen','chip','promotion_label','status'] as $field) {
+        $data = [];
+        foreach (['product_name', 'brand', 'description', 'screen', 'chip', 'promotion_label', 'status'] as $field) {
             if (array_key_exists($field, $_POST)) {
                 $data[$field] = trim((string) $_POST[$field]);
             } else {
                 $data[$field] = (string) ($old[$field] ?? '');
             }
         }
-        $data['category_id']=filter_var($_POST['category_id']??null,FILTER_VALIDATE_INT);
-        $data['list_price']=array_key_exists('list_price', $_POST) ? (($_POST['list_price']==='')?null:$_POST['list_price']) : ($old['list_price'] ?? null);
-        $data['old_price']=array_key_exists('old_price', $_POST) ? (($_POST['old_price']==='')?null:$_POST['old_price']) : ($old['old_price'] ?? null);
-        if (!$data['product_name'] || !$data['brand'] || !$data['category_id'] || !in_array($data['status'],['dang_ban','ngung_ban'],true)) {http_response_code(400);exit('Thông tin không hợp lệ');}
-        foreach(['list_price','old_price'] as $field) if ($data[$field]!==null && (!is_numeric($data[$field]) || (float)$data[$field]<0)){http_response_code(400);exit('Giá không hợp lệ');}
-        $catIds=array_map('intval',array_column($this->productModel->getCategories(),'id'));
-        if(!in_array((int)$data['category_id'],$catIds,true)){http_response_code(400);exit('Danh mục không hợp lệ');}
+        $data['category_id'] = filter_var($_POST['category_id'] ?? null, FILTER_VALIDATE_INT);
+        // Đồng bộ thương hiệu theo danh mục được chọn
+        $categories = $this->productModel->getCategories();
+        foreach ($categories as $category) {
+            if ((int)$category['id'] === (int)$data['category_id']) {
+                $data['brand'] = $category['name'];
+                break;
+            }
+        }
+        $data['list_price'] = array_key_exists('list_price', $_POST) ? (($_POST['list_price'] === '') ? null : $_POST['list_price']) : ($old['list_price'] ?? null);
+        $data['old_price'] = array_key_exists('old_price', $_POST) ? (($_POST['old_price'] === '') ? null : $_POST['old_price']) : ($old['old_price'] ?? null);
+        if (!$data['product_name'] || !$data['brand'] || !$data['category_id'] || !in_array($data['status'], ['dang_ban', 'ngung_ban'], true)) {
+            http_response_code(400);
+            exit('Thông tin không hợp lệ');
+        }
+        foreach (['list_price', 'old_price'] as $field) if ($data[$field] !== null && (!is_numeric($data[$field]) || (float)$data[$field] < 0)) {
+            http_response_code(400);
+            exit('Giá không hợp lệ');
+        }
+        $catIds = array_map('intval', array_column($this->productModel->getCategories(), 'id'));
+        if (!in_array((int)$data['category_id'], $catIds, true)) {
+            http_response_code(400);
+            exit('Danh mục không hợp lệ');
+        }
         ProductInputValidation::abort(ProductInputValidation::product($data, $this->productModel->getCategories()));
-        $oldImages=json_decode($old['image_list']??'[]',true);
-        $oldImages=is_array($oldImages)?($oldImages['anh_san_pham']??$oldImages):[];
-        $remove=$_POST['delete_images']??[]; if(!is_array($remove))$remove=[];
-        $remove=array_values(array_intersect($oldImages,$remove));
-        $added=[];
+        $oldImages = json_decode($old['image_list'] ?? '[]', true);
+        $oldImages = is_array($oldImages) ? ($oldImages['anh_san_pham'] ?? $oldImages) : [];
+        $remove = $_POST['delete_images'] ?? [];
+        if (!is_array($remove)) $remove = [];
+        $remove = array_values(array_intersect($oldImages, $remove));
+        $added = [];
         try {
-            $added=$this->uploadProductImages();
-            $remaining=array_values(array_diff($oldImages,$remove));
-            $data['image_list']=json_encode(array_merge($remaining,$added),JSON_UNESCAPED_SLASHES|JSON_THROW_ON_ERROR);
-            $this->productModel->update($id,$data);
+            $added = $this->uploadProductImages();
+            $remaining = array_values(array_diff($oldImages, $remove));
+            $data['image_list'] = json_encode(array_merge($remaining, $added), JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+            $this->productModel->update($id, $data);
             // Do not delete files physically here: another product may share a path.
-            header('Location: ' . \App\Helpers\SecurityHelper::url('/admin/products?success=updated'), true, 303);exit;
+            header('Location: ' . \App\Helpers\SecurityHelper::url('/admin/products?success=updated'), true, 303);
+            exit;
         } catch (Throwable $e) {
-            foreach ($added as $path) { $file=dirname(__DIR__,2).'/'.$path; if (is_file($file))unlink($file); }
-            error_log($e->getMessage()); http_response_code(500);exit('Không cập nhật được sản phẩm');
+            foreach ($added as $path) {
+                $file = dirname(__DIR__, 2) . '/' . $path;
+                if (is_file($file)) unlink($file);
+            }
+            error_log($e->getMessage());
+            http_response_code(500);
+            exit('Không cập nhật được sản phẩm');
         }
     }
 
-    public function images(int $id): void {
+    public function images(int $id): void
+    {
         $product = $this->productModel->getById($id);
-        if (!$product) { http_response_code(404); exit('Không tìm thấy sản phẩm'); }
+        if (!$product) {
+            http_response_code(404);
+            exit('Không tìm thấy sản phẩm');
+        }
         $images = json_decode($product['image_list'] ?? '[]', true);
         $images = is_array($images) ? ($images['anh_san_pham'] ?? $images) : [];
         $currentUser = \App\Helpers\SessionHelper::getUser();
@@ -541,11 +586,21 @@ class ProductController
         require __DIR__ . '/../view/layout/footer.php';
     }
 
-    public function uploadImages(int $id): void {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') { http_response_code(405); exit('Chỉ cho phép POST'); }
-        if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], (string) ($_POST['csrf_token'] ?? ''))) { http_response_code(403); exit('CSRF không hợp lệ'); }
+    public function uploadImages(int $id): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            exit('Chỉ cho phép POST');
+        }
+        if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], (string) ($_POST['csrf_token'] ?? ''))) {
+            http_response_code(403);
+            exit('CSRF không hợp lệ');
+        }
         $old = $this->productModel->getById($id);
-        if (!$old) { http_response_code(404); exit('Không tìm thấy sản phẩm'); }
+        if (!$old) {
+            http_response_code(404);
+            exit('Không tìm thấy sản phẩm');
+        }
         $oldImages = json_decode($old['image_list'] ?? '[]', true);
         $oldImages = is_array($oldImages) ? ($oldImages['anh_san_pham'] ?? $oldImages) : [];
         $added = [];
@@ -557,16 +612,31 @@ class ProductController
             header('Location: ' . \App\Helpers\SecurityHelper::url('/admin/products/' . $id . '/images?success=uploaded'), true, 303);
             exit;
         } catch (Throwable $e) {
-            foreach ($added as $path) { $file = dirname(__DIR__, 2) . '/' . $path; if (is_file($file)) unlink($file); }
-            error_log($e->getMessage()); http_response_code(500); exit('Không tải được ảnh lên');
+            foreach ($added as $path) {
+                $file = dirname(__DIR__, 2) . '/' . $path;
+                if (is_file($file)) unlink($file);
+            }
+            error_log($e->getMessage());
+            http_response_code(500);
+            exit('Không tải được ảnh lên');
         }
     }
 
-    public function setPrimaryImage(int $id): void {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') { http_response_code(405); exit('Chỉ cho phép POST'); }
-        if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], (string) ($_POST['csrf_token'] ?? ''))) { http_response_code(403); exit('CSRF không hợp lệ'); }
+    public function setPrimaryImage(int $id): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            exit('Chỉ cho phép POST');
+        }
+        if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], (string) ($_POST['csrf_token'] ?? ''))) {
+            http_response_code(403);
+            exit('CSRF không hợp lệ');
+        }
         $old = $this->productModel->getById($id);
-        if (!$old) { http_response_code(404); exit('Không tìm thấy sản phẩm'); }
+        if (!$old) {
+            http_response_code(404);
+            exit('Không tìm thấy sản phẩm');
+        }
         $target = (string) ($_POST['image_path'] ?? '');
         $oldImages = json_decode($old['image_list'] ?? '[]', true);
         $oldImages = is_array($oldImages) ? ($oldImages['anh_san_pham'] ?? $oldImages) : [];
@@ -580,11 +650,21 @@ class ProductController
         exit;
     }
 
-    public function deleteImage(int $id): void {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') { http_response_code(405); exit('Chỉ cho phép POST'); }
-        if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], (string) ($_POST['csrf_token'] ?? ''))) { http_response_code(403); exit('CSRF không hợp lệ'); }
+    public function deleteImage(int $id): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            exit('Chỉ cho phép POST');
+        }
+        if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], (string) ($_POST['csrf_token'] ?? ''))) {
+            http_response_code(403);
+            exit('CSRF không hợp lệ');
+        }
         $old = $this->productModel->getById($id);
-        if (!$old) { http_response_code(404); exit('Không tìm thấy sản phẩm'); }
+        if (!$old) {
+            http_response_code(404);
+            exit('Không tìm thấy sản phẩm');
+        }
         $target = (string) ($_POST['image_path'] ?? '');
         $oldImages = json_decode($old['image_list'] ?? '[]', true);
         $oldImages = is_array($oldImages) ? ($oldImages['anh_san_pham'] ?? $oldImages) : [];
@@ -594,5 +674,103 @@ class ProductController
         $this->productModel->update($id, $data);
         header('Location: ' . \App\Helpers\SecurityHelper::url('/admin/products/' . $id . '/images?success=deleted'), true, 303);
         exit;
+    }
+
+    public function delete(): void
+    {
+        // Chỉ chấp nhận POST
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            exit('Chỉ chấp nhận POST');
+        }
+        // Kiểm tra CSRF
+        if (
+            empty($_SESSION['csrf_token']) ||
+            !is_string($_POST['csrf_token'] ?? null) ||
+            !hash_equals(
+                $_SESSION['csrf_token'],
+                $_POST['csrf_token']
+            )
+        ) {
+            http_response_code(403);
+            exit('CSRF không hợp lệ');
+        }
+        // Lấy ID sản phẩm
+        $id = filter_var(
+            $_POST['product_id'] ?? null,
+            FILTER_VALIDATE_INT,
+            ['options' => ['min_range' => 1]]
+        );
+        if (!$id) {
+            http_response_code(400);
+            exit('ID sản phẩm không hợp lệ');
+        }
+        // Đường dẫn quay lại danh sách sản phẩm
+        $url = \App\Helpers\SecurityHelper::url(
+            '/admin/products'
+        );
+        try {
+            // Bắt đầu Transaction
+            $this->pdo->beginTransaction();
+            // Khóa và kiểm tra sản phẩm tồn tại
+            $stmt = $this->pdo->prepare(
+                "SELECT product_id FROM products
+             WHERE product_id = ? FOR UPDATE"
+            );
+            $stmt->execute([$id]);
+            if (!$stmt->fetchColumn()) {
+                $this->pdo->rollBack();
+                header(
+                    'Location: ' . $url . '&error=product_not_found',
+                    true,
+                    303
+                );
+
+                exit;
+            }
+            // Kiểm tra sản phẩm đã có đơn hàng
+            if ($this->productModel->hasOrders($id)) {
+                $this->pdo->rollBack();
+                header(
+                    'Location: ' . $url . '&error=product_has_orders',
+                    true,
+                    303
+                );
+                exit;
+            }
+            // Xóa các biến thể thuộc sản phẩm
+            if (!$this->productModel->deleteVariants($id)) {
+                throw new RuntimeException(
+                    'Không thể xóa biến thể'
+                );
+            }
+            // Xóa sản phẩm
+            if (!$this->productModel->delete($id)) {
+                throw new RuntimeException(
+                    'Không thể xóa sản phẩm'
+                );
+            }
+            // Lưu thay đổi
+            $this->pdo->commit();
+
+            header(
+                'Location: ' . $url . '&success=product_deleted',
+                true,
+                303
+            );
+            exit;
+        } catch (Throwable $e) {
+            // Hủy toàn bộ thay đổi nếu có lỗi
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+            error_log($e->getMessage());
+            header(
+                'Location: ' . $url . '&error=delete_failed',
+                true,
+                303
+            );
+            exit;
+        }
     }
 }
