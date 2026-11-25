@@ -21,7 +21,7 @@ class ProductVariantController {
         }
         try {
             $this->variants->create($id,$data);
-            header('Location: /admin/index.php?route=/admin/products/'.$id.'/variants&success=variant_created',true,303);
+            header('Location: ' . \App\Helpers\SecurityHelper::url('/admin/products/' . $id . '/variants?success=variant_created'), true, 303);
             exit;
         } catch (PDOException $e) {
             error_log($e->getMessage());

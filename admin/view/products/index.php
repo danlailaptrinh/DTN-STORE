@@ -117,6 +117,9 @@ use App\Helpers\SecurityHelper;
                                 <a href="<?= SecurityHelper::url('/admin/products/edit/' . (int) $p['id']) ?>" class="btn btn-sm btn-outline-primary" title="Sửa">
                                     <i class="bi bi-pencil"></i> Sửa
                                 </a>
+                                <button type="button" class="btn btn-sm btn-outline-danger" disabled title="Chức năng xóa sản phẩm đang phát triển">
+                                    <i class="bi bi-trash"></i> Xóa
+                                </button>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -133,14 +136,14 @@ use App\Helpers\SecurityHelper;
         <ul class="pagination">
             <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                 <?php
-                $url = SecurityHelper::url('/admin/products') . '?' . http_build_query(array_filter([
+                $url = SecurityHelper::url('/admin/products') . '&' . http_build_query(array_filter([
                     'keyword'     => $keyword ?? '',
                     'category_id' => !empty($categoryId) ? $categoryId : '',
                     'page'        => $i,
                 ]));
                 ?>
                 <li class="page-item <?= $i === ($currentPage ?? 1) ? 'active' : '' ?>">
-                    <a class="page-link <?= $i === ($currentPage ?? 1) ? 'bg-danger border-danger text-white' : 'text-danger' ?>" href="<?= SecurityHelper::e($url) ?>"><?= $i ?></a>
+                    <a class="page-link <?= $i === ($currentPage ?? 1) ? 'bg-danger border-danger' : 'text-danger' ?>" href="<?= SecurityHelper::e($url) ?>"><?= $i ?></a>
                 </li>
             <?php endfor; ?>
         </ul>

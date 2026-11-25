@@ -355,7 +355,7 @@ class ProductController
 
             // Chuyển về danh sách
             header(
-                'Location: /admin/index.php?route=/admin/products&success=created',
+                'Location: ' . \App\Helpers\SecurityHelper::url('/admin/products?success=created'),
                 true,
                 303
             );
@@ -490,23 +490,21 @@ class ProductController
         if (empty($_POST['product_name']) && !empty($_POST['name'])) {
             $_POST['product_name'] = $_POST['name'];
         }
-        if (empty($_POST['brand']) && !empty($_POST['category_id'])) {
-            foreach ($this->productModel->getCategories() as $cat) {
-                if ((int)$cat['id'] === (int)$_POST['category_id']) {
-                    $_POST['brand'] = $cat['name'];
-                    break;
-                }
-            }
-        }
         if (isset($_POST['status'])) {
             if ($_POST['status'] === '1') $_POST['status'] = 'dang_ban';
             elseif ($_POST['status'] === '0') $_POST['status'] = 'ngung_ban';
         }
         $data=[];
-        foreach (['product_name','brand','description','screen','chip','promotion_label','status'] as $field) $data[$field]=trim((string)($_POST[$field]??''));
+        foreach (['product_name','brand','description','screen','chip','promotion_label','status'] as $field) {
+            if (array_key_exists($field, $_POST)) {
+                $data[$field] = trim((string) $_POST[$field]);
+            } else {
+                $data[$field] = (string) ($old[$field] ?? '');
+            }
+        }
         $data['category_id']=filter_var($_POST['category_id']??null,FILTER_VALIDATE_INT);
-        $data['list_price']=($_POST['list_price']??'')===''?null:$_POST['list_price'];
-        $data['old_price']=($_POST['old_price']??'')===''?null:$_POST['old_price'];
+        $data['list_price']=array_key_exists('list_price', $_POST) ? (($_POST['list_price']==='')?null:$_POST['list_price']) : ($old['list_price'] ?? null);
+        $data['old_price']=array_key_exists('old_price', $_POST) ? (($_POST['old_price']==='')?null:$_POST['old_price']) : ($old['old_price'] ?? null);
         if (!$data['product_name'] || !$data['brand'] || !$data['category_id'] || !in_array($data['status'],['dang_ban','ngung_ban'],true)) {http_response_code(400);exit('Thông tin không hợp lệ');}
         foreach(['list_price','old_price'] as $field) if ($data[$field]!==null && (!is_numeric($data[$field]) || (float)$data[$field]<0)){http_response_code(400);exit('Giá không hợp lệ');}
         $catIds=array_map('intval',array_column($this->productModel->getCategories(),'id'));
@@ -523,10 +521,78 @@ class ProductController
             $data['image_list']=json_encode(array_merge($remaining,$added),JSON_UNESCAPED_SLASHES|JSON_THROW_ON_ERROR);
             $this->productModel->update($id,$data);
             // Do not delete files physically here: another product may share a path.
-            header('Location: /admin/index.php?route=/admin/products&success=updated',true,303);exit;
+            header('Location: ' . \App\Helpers\SecurityHelper::url('/admin/products?success=updated'), true, 303);exit;
         } catch (Throwable $e) {
             foreach ($added as $path) { $file=dirname(__DIR__,2).'/'.$path; if (is_file($file))unlink($file); }
             error_log($e->getMessage()); http_response_code(500);exit('Không cập nhật được sản phẩm');
         }
+    }
+
+    public function images(int $id): void {
+        $product = $this->productModel->getById($id);
+        if (!$product) { http_response_code(404); exit('Không tìm thấy sản phẩm'); }
+        $images = json_decode($product['image_list'] ?? '[]', true);
+        $images = is_array($images) ? ($images['anh_san_pham'] ?? $images) : [];
+        $currentUser = \App\Helpers\SessionHelper::getUser();
+        $pageTitle = 'Quản lý hình ảnh | DTD STORE';
+        $activeMenu = 'products';
+        require __DIR__ . '/../view/layout/header.php';
+        require __DIR__ . '/../view/products/images.php';
+        require __DIR__ . '/../view/layout/footer.php';
+    }
+
+    public function uploadImages(int $id): void {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') { http_response_code(405); exit('Chỉ cho phép POST'); }
+        if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], (string) ($_POST['csrf_token'] ?? ''))) { http_response_code(403); exit('CSRF không hợp lệ'); }
+        $old = $this->productModel->getById($id);
+        if (!$old) { http_response_code(404); exit('Không tìm thấy sản phẩm'); }
+        $oldImages = json_decode($old['image_list'] ?? '[]', true);
+        $oldImages = is_array($oldImages) ? ($oldImages['anh_san_pham'] ?? $oldImages) : [];
+        $added = [];
+        try {
+            $added = $this->uploadProductImages();
+            $data = $old;
+            $data['image_list'] = json_encode(array_values(array_merge($oldImages, $added)), JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+            $this->productModel->update($id, $data);
+            header('Location: ' . \App\Helpers\SecurityHelper::url('/admin/products/' . $id . '/images?success=uploaded'), true, 303);
+            exit;
+        } catch (Throwable $e) {
+            foreach ($added as $path) { $file = dirname(__DIR__, 2) . '/' . $path; if (is_file($file)) unlink($file); }
+            error_log($e->getMessage()); http_response_code(500); exit('Không tải được ảnh lên');
+        }
+    }
+
+    public function setPrimaryImage(int $id): void {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') { http_response_code(405); exit('Chỉ cho phép POST'); }
+        if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], (string) ($_POST['csrf_token'] ?? ''))) { http_response_code(403); exit('CSRF không hợp lệ'); }
+        $old = $this->productModel->getById($id);
+        if (!$old) { http_response_code(404); exit('Không tìm thấy sản phẩm'); }
+        $target = (string) ($_POST['image_path'] ?? '');
+        $oldImages = json_decode($old['image_list'] ?? '[]', true);
+        $oldImages = is_array($oldImages) ? ($oldImages['anh_san_pham'] ?? $oldImages) : [];
+        if ($target !== '' && in_array($target, $oldImages, true)) {
+            $rest = array_values(array_diff($oldImages, [$target]));
+            $data = $old;
+            $data['image_list'] = json_encode(array_merge([$target], $rest), JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+            $this->productModel->update($id, $data);
+        }
+        header('Location: ' . \App\Helpers\SecurityHelper::url('/admin/products/' . $id . '/images?success=primary'), true, 303);
+        exit;
+    }
+
+    public function deleteImage(int $id): void {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') { http_response_code(405); exit('Chỉ cho phép POST'); }
+        if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], (string) ($_POST['csrf_token'] ?? ''))) { http_response_code(403); exit('CSRF không hợp lệ'); }
+        $old = $this->productModel->getById($id);
+        if (!$old) { http_response_code(404); exit('Không tìm thấy sản phẩm'); }
+        $target = (string) ($_POST['image_path'] ?? '');
+        $oldImages = json_decode($old['image_list'] ?? '[]', true);
+        $oldImages = is_array($oldImages) ? ($oldImages['anh_san_pham'] ?? $oldImages) : [];
+        $remaining = array_values(array_diff($oldImages, [$target]));
+        $data = $old;
+        $data['image_list'] = json_encode($remaining, JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        $this->productModel->update($id, $data);
+        header('Location: ' . \App\Helpers\SecurityHelper::url('/admin/products/' . $id . '/images?success=deleted'), true, 303);
+        exit;
     }
 }

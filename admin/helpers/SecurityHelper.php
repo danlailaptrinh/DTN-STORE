@@ -4,6 +4,20 @@ namespace App\Helpers;
 
 class SecurityHelper
 {
+    // Xác định Base URL của dự án (hỗ trợ cả root và thư mục con trên localhost)
+    public static function baseUrl(): string
+    {
+        $scriptName = str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? ''));
+        if ($scriptName === '' || $scriptName[0] !== '/') {
+            return '';
+        }
+
+        $dir = rtrim(str_replace('\\', '/', dirname($scriptName)), '/');
+        $dir = preg_replace('#/(admin|employee|demo)$#', '', $dir) ?? $dir;
+
+        return $dir === '/' ? '' : $dir;
+    }
+
     // Chống XSS khi hiển thị dữ liệu
     public static function e($value): string
     {
@@ -20,33 +34,29 @@ class SecurityHelper
         return trim((string) ($value ?? ''));
     }
 
-    // Tạo đường dẫn Router Admin hoặc Client
+    // Tạo đường dẫn Router MVC chính thức (Client, Admin, Employee)
     public static function url(string $route = '/admin'): string
     {
-        $base = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? '', 2), '/\\');
+        $base = self::baseUrl();
+        $parts = explode('?', $route, 2);
+        $path = $parts[0] === '' ? '/' : $parts[0];
+        $query = isset($parts[1]) && $parts[1] !== '' ? '&' . $parts[1] : '';
 
-        if ($route === '/' || !str_starts_with($route, '/admin')) {
-            return ($base === '' ? '' : $base) . '/index.php?route=' . rawurlencode($route);
+        if (str_starts_with($path, '/admin')) {
+            return $base . '/admin/index.php?route=' . rawurlencode($path) . $query;
         }
 
-        $parts = explode('?', $route, 2);
-        $path = $parts[0];
-        $query = isset($parts[1]) ? '&' . $parts[1] : '';
+        if (str_starts_with($path, '/employee')) {
+            return $base . '/employee/index.php?route=' . rawurlencode($path) . $query;
+        }
 
-        return ($base === '' ? '' : $base)
-            . '/admin/index.php?route='
-            . rawurlencode($path)
-            . $query;
+        return $base . '/index.php?route=' . rawurlencode($path) . $query;
     }
 
     // Lấy đường dẫn CSS, JS, hình ảnh
     public static function asset(string $path): string
     {
-        $base = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? '', 2), '/\\');
-
-        return ($base === '' ? '' : $base)
-            . '/assets/'
-            . ltrim($path, '/');
+        return self::baseUrl() . '/assets/' . ltrim($path, '/');
     }
 
     // Hiển thị ảnh sản phẩm
@@ -68,8 +78,7 @@ class SecurityHelper
         $root = dirname(__DIR__, 2);
 
         if (is_file($root . '/' . $path)) {
-            $base = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? '', 2), '/\\');
-            return ($base === '' ? '' : $base) . '/' . $path;
+            return self::baseUrl() . '/' . $path;
         }
 
         if (is_file($root . '/assets/images/' . $path)) {

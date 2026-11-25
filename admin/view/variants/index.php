@@ -120,7 +120,12 @@ $productId = (int)($product['product_id'] ?? $product['id'] ?? 0);
                                             <?= ((int) ($v['is_on_sale'] ?? 0) === 1) ? '<span class="badge bg-warning text-dark">KM</span>' : 'Thường' ?>
                                         </td>
                                         <td class="text-end text-nowrap">
-                                            <a href="<?= SecurityHelper::url('/admin/variants/edit/' . (int) ($v['variant_id'] ?? $v['id'])) ?>" class="btn btn-sm btn-outline-primary">Sửa</a>
+                                            <button type="button" class="btn btn-sm btn-outline-primary" disabled title="Chức năng sửa biến thể đang phát triển">
+                                                <i class="bi bi-pencil"></i> Sửa
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" disabled title="Chức năng xóa biến thể đang phát triển">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
