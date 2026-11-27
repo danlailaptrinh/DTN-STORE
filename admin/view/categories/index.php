@@ -5,7 +5,7 @@ use App\Helpers\SecurityHelper;
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
     <div>
         <h1 class="h4 fw-bold mb-1">Quản lý danh mục (Thương hiệu)</h1>
-        <p class="text-muted small mb-0">Tổng số: <strong><?= (int) $totalItems ?></strong> danh mục</p>
+        <p class="text-muted small mb-0">Tổng số: <strong><?= (int) ($totalItems ?? 0) ?></strong> danh mục</p>
     </div>
     <a href="<?= SecurityHelper::url('/admin/categories/create') ?>" class="btn btn-dtd">
         <i class="bi bi-plus-circle me-1"></i>Thêm danh mục
@@ -13,10 +13,11 @@ use App\Helpers\SecurityHelper;
 </div>
 
 <form action="<?= SecurityHelper::url('/admin/categories') ?>" method="GET" class="card border-0 shadow-sm mb-4">
+    <input type="hidden" name="route" value="/admin/categories">
     <div class="card-body">
         <div class="row g-2 align-items-center">
             <div class="col-md-6">
-                <input type="text" name="keyword" class="form-control" placeholder="Tìm kiếm theo tên hoặc mô tả danh mục..." value="<?= SecurityHelper::e($keyword) ?>">
+                <input type="text" name="keyword" class="form-control" placeholder="Tìm kiếm theo tên hoặc slug danh mục..." value="<?= SecurityHelper::e($keyword ?? '') ?>">
             </div>
             <div class="col-auto">
                 <button type="submit" class="btn btn-dtd"><i class="bi bi-search me-1"></i>Tìm kiếm</button>
@@ -34,7 +35,7 @@ use App\Helpers\SecurityHelper;
                     <th>ID</th>
                     <th>Tên danh mục</th>
                     <th>Slug</th>
-                    <th>Số điện thoại</th>
+                    <th>Số sản phẩm</th>
                     <th>Trạng thái</th>
                     <th class="text-end">Thao tác</th>
                 </tr>
@@ -79,13 +80,13 @@ use App\Helpers\SecurityHelper;
     </div>
 </div>
 
-<?php if ($totalPages > 1): ?>
+<?php if (($totalPages ?? 1) > 1): ?>
     <nav class="mt-4 d-flex justify-content-center">
         <ul class="pagination">
             <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                <?php $url = SecurityHelper::url('/admin/categories') . '?' . http_build_query(array_filter(['keyword' => $keyword, 'page' => $i])); ?>
-                <li class="page-item <?= $i === $currentPage ? 'active' : '' ?>">
-                    <a class="page-link <?= $i === $currentPage ? 'bg-danger border-danger' : 'text-danger' ?>" href="<?= SecurityHelper::e($url) ?>"><?= $i ?></a>
+                <?php $url = SecurityHelper::url('/admin/categories') . '&' . http_build_query(array_filter(['keyword' => $keyword ?? '', 'page' => $i])); ?>
+                <li class="page-item <?= $i === ($currentPage ?? 1) ? 'active' : '' ?>">
+                    <a class="page-link <?= $i === ($currentPage ?? 1) ? 'bg-danger border-danger' : 'text-danger' ?>" href="<?= SecurityHelper::e($url) ?>"><?= $i ?></a>
                 </li>
             <?php endfor; ?>
         </ul>

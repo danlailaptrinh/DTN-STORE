@@ -49,9 +49,16 @@ $productId = (int)($product['product_id'] ?? $product['id'] ?? 0);
                 </div>
             </div>
 
-            <div class="mb-4">
+            <div class="mb-3">
                 <label class="form-label small fw-semibold">Mô tả sản phẩm</label>
                 <textarea name="description" class="form-control" rows="4"><?= SecurityHelper::e($product['description'] ?? '') ?></textarea>
+            </div>
+
+            <div class="form-check mb-4">
+                <input class="form-check-input" type="checkbox" name="is_featured" id="isFeaturedEdit" value="1" <?= (int) ($product['is_featured'] ?? 0) === 1 ? 'checked' : '' ?>>
+                <label class="form-check-label small fw-semibold" for="isFeaturedEdit">
+                    Đánh dấu là Điện thoại nổi bật trên Trang chủ
+                </label>
             </div>
 
             <button type="submit" class="btn btn-dtd px-4">Lưu thay đổi</button>

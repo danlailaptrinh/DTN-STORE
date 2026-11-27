@@ -14,7 +14,7 @@ use App\Helpers\SecurityHelper;
 
             <div class="mb-3">
                 <label class="form-label small fw-semibold">Tên danh mục / Thương hiệu <span class="text-danger">*</span></label>
-                <input type="text" name="name" class="form-control" placeholder="VD: Google Pixel, Asus ROG..." required>
+                <input type="text" name="name" class="form-control" maxlength="150" placeholder="VD: Google Pixel, Asus ROG..." required>
             </div>
 
             <div class="mb-3">

@@ -120,14 +120,85 @@ if ($route === '/admin/products/delete') {
     exit;
 }
 
+// Route danh sách & thêm mới danh mục
+if ($route === '/admin/categories') {
+    if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        http_response_code(405);
+        exit('Chỉ chấp nhận GET');
+    }
+    require_once __DIR__ . '/../config/pdo.php';
+    require_once __DIR__ . '/controller/CategoryController.php';
+    $controller = new CategoryController($pdo);
+    $controller->index();
+    exit;
+}
+
+if ($route === '/admin/categories/create') {
+    if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        http_response_code(405);
+        exit('Chỉ chấp nhận GET');
+    }
+    require_once __DIR__ . '/../config/pdo.php';
+    require_once __DIR__ . '/controller/CategoryController.php';
+    $controller = new CategoryController($pdo);
+    $controller->create();
+    exit;
+}
+
+if ($route === '/admin/categories/store') {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
+        exit('Chỉ chấp nhận POST');
+    }
+    require_once __DIR__ . '/../config/pdo.php';
+    require_once __DIR__ . '/controller/CategoryController.php';
+    $controller = new CategoryController($pdo);
+    $controller->store();
+    exit;
+}
+
+if (preg_match('~^/admin/categories/edit/([1-9][0-9]*)$~', $route, $m)) {
+    if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+        http_response_code(405);
+        exit('Chỉ chấp nhận GET');
+    }
+    require_once __DIR__ . '/../config/pdo.php';
+    require_once __DIR__ . '/controller/CategoryController.php';
+    $controller = new CategoryController($pdo);
+    $controller->edit((int) $m[1]);
+    exit;
+}
+
+if (preg_match('~^/admin/categories/update/([1-9][0-9]*)$~', $route, $m)) {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
+        exit('Chỉ chấp nhận POST');
+    }
+    require_once __DIR__ . '/../config/pdo.php';
+    require_once __DIR__ . '/controller/CategoryController.php';
+    $controller = new CategoryController($pdo);
+    $controller->update((int) $m[1]);
+    exit;
+}
+
+if ($route === '/admin/categories/delete') {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
+        exit('Chỉ chấp nhận POST');
+    }
+    require_once __DIR__ . '/../config/pdo.php';
+    require_once __DIR__ . '/controller/CategoryController.php';
+    $controller = new CategoryController($pdo);
+    $controller->delete();
+    exit;
+}
+
 // 3. Các route Admin đã khai báo theo cấu trúc dự án nhưng chưa triển khai Controller/Model
 $currentUser = SessionHelper::getUser();
 $unimplementedMeta = null;
 
 if ($route === '/admin' || $route === '/admin/') {
     $unimplementedMeta = ['menu' => 'dashboard', 'title' => 'Tổng quan hệ thống', 'desc' => 'DashboardController chưa được triển khai nghiệp vụ.'];
-} elseif (preg_match('~^/admin/categories(?:$|/(?:create|store|delete|(?:edit|update)/[1-9][0-9]*))$~', $route)) {
-    $unimplementedMeta = ['menu' => 'categories', 'title' => 'Quản lý danh mục', 'desc' => 'CategoryController chưa được triển khai nghiệp vụ.'];
 } elseif (preg_match('~^/admin/orders(?:$|/(?:assign|status|(?:detail/)?[1-9][0-9]*))$~', $route)) {
     $unimplementedMeta = ['menu' => 'orders', 'title' => 'Quản lý đơn hàng', 'desc' => 'OrderController chưa được triển khai nghiệp vụ.'];
 } elseif (preg_match('~^/admin/users(?:$|/(?:create|store|toggle-status|(?:detail/)?[1-9][0-9]*))$~', $route)) {

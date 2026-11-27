@@ -14,7 +14,7 @@ use App\Helpers\SecurityHelper;
 
             <div class="mb-3">
                 <label class="form-label small fw-semibold">Tên danh mục / Thương hiệu <span class="text-danger">*</span></label>
-                <input type="text" name="name" class="form-control" value="<?= SecurityHelper::e($category['name']) ?>" required>
+                <input type="text" name="name" class="form-control" maxlength="150" value="<?= SecurityHelper::e($category['name']) ?>" required>
             </div>
 
             <div class="mb-3">

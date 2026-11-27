@@ -2,13 +2,11 @@
 class Product
 {
     private $pdo;
-
     // Nhận kết nối database từ bên ngoài
     public function __construct($pdo)
     {
         $this->pdo = $pdo;
     }
-
     // Lấy tất cả sản phẩm
     public function getAll()
     {
@@ -52,7 +50,7 @@ class Product
         p.category_id,
         c.category_name,
         p.image_list,
-0 AS is_featured,
+        p.is_featured,
 CASE
     WHEN p.status = 'dang_ban'
     THEN 1 ELSE 0
@@ -79,7 +77,7 @@ END AS status,
             $params['category_id'] = $categoryId;
         }
 
-        $sql .= " GROUP BY p.product_id, c.category_name
+        $sql .= " GROUP BY p.product_id, c.category_name, p.is_featured
                   ORDER BY p.product_id DESC";
 
         $stmt = $this->pdo->prepare($sql);
@@ -192,9 +190,9 @@ END AS status,
 
     public function update($id, array $data): void
     {
-        $sql = "UPDATE products SET product_name=?, category_id=?, brand=?, description=?, screen=?, chip=?, list_price=?, old_price=?, promotion_label=?, status=?, image_list=? WHERE product_id=?";
+        $sql = "UPDATE products SET product_name=?, category_id=?, brand=?, description=?, screen=?, chip=?, list_price=?, old_price=?, promotion_label=?, status=?, is_featured=?, image_list=? WHERE product_id=?";
         $s = $this->pdo->prepare($sql);
-        $s->execute([$data['product_name'], $data['category_id'], $data['brand'], $data['description'], $data['screen'], $data['chip'], $data['list_price'], $data['old_price'], $data['promotion_label'], $data['status'], $data['image_list'], $id]);
+        $s->execute([$data['product_name'], $data['category_id'], $data['brand'], $data['description'], $data['screen'], $data['chip'], $data['list_price'], $data['old_price'], $data['promotion_label'], $data['status'], (int) ($data['is_featured'] ?? 0), $data['image_list'], $id]);
     }
     public function getVariants($productId): array
     {

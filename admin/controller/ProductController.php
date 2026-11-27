@@ -1,65 +1,48 @@
 <?php
 require_once __DIR__ . '/../model/Product.php';
 require_once __DIR__ . '/ProductInputValidation.php';
-
 class ProductController
 {
     private $productModel;
     private $pdo;
-
     public function __construct($pdo)
     {
         $this->pdo = $pdo;
         $this->productModel = new Product($pdo);
     }
-
     //Lấy dữ liệu cho trang danh sách sản phẩm
-
     public function listData()
-    {
-        // Lấy từ khóa tìm kiếm
+    {   // Lấy từ khóa tìm kiếm
         $keyword = $_GET['keyword'] ?? '';
-
         if (!is_string($keyword)) {
             $keyword = '';
         }
-
         $keyword = trim($keyword);
-
         // Lấy id danh mục
         $categoryId = filter_var(
             $_GET['category_id'] ?? 0,
             FILTER_VALIDATE_INT
         );
-
         $categoryId = max(0, (int) $categoryId);
-
         // Gọi model lấy dữ liệu
         $products = $this->productModel->getProductList(
             $keyword,
             $categoryId
         );
-
         $categories = $this->productModel->getCategories();
-
         // Xử lý hình ảnh sản phẩm
         foreach ($products as &$product) {
-
             $images = json_decode(
                 $product['image_list'] ?? '[]',
                 true
             );
-
             $imageList = [];
-
             if (is_array($images)) {
                 $imageList = $images['anh_san_pham'] ?? $images;
             }
-
             $image = is_array($imageList)
                 ? (string) ($imageList[0] ?? '')
                 : '';
-
             // Nếu chỉ lưu tên file thì thêm đường dẫn
             if ($image !== '' && !str_contains($image, '/')) {
                 $image = 'assets/images/products/' . $image;
@@ -380,29 +363,21 @@ class ProductController
         }
     }
 
-
-
-
     private function uploadProductImages(): array
     {
         $savedPaths = [];
-
         if (!isset($_FILES['images'])) {
             return [];
         }
-
         $files = $_FILES['images'];
         if (is_array($files['error'] ?? null) && count($files['error']) > 10) {
             throw new \RuntimeException('Tối đa 10 ảnh mỗi lần');
         }
-
         if (!is_array($files['error'])) {
             throw new \RuntimeException('Dữ liệu upload không hợp lệ');
         }
-
         $uploadDir = dirname(__DIR__, 2)
             . '/assets/uploads/products/';
-
         if (
             !is_dir($uploadDir) &&
             !mkdir($uploadDir, 0755, true) &&
@@ -418,21 +393,16 @@ class ProductController
         ];
 
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
-
         try {
             foreach ($files['error'] as $i => $error) {
-
                 if ($error === UPLOAD_ERR_NO_FILE) {
                     continue;
                 }
-
                 if ($error !== UPLOAD_ERR_OK) {
                     throw new \RuntimeException('Lỗi upload ảnh');
                 }
-
                 $tmpName = $files['tmp_name'][$i];
                 $size = $files['size'][$i];
-
                 if ($size <= 0 || $size > 5 * 1024 * 1024) {
                     throw new \RuntimeException('Ảnh tối đa 5MB');
                 }
@@ -530,6 +500,7 @@ class ProductController
         }
         $data['list_price'] = array_key_exists('list_price', $_POST) ? (($_POST['list_price'] === '') ? null : $_POST['list_price']) : ($old['list_price'] ?? null);
         $data['old_price'] = array_key_exists('old_price', $_POST) ? (($_POST['old_price'] === '') ? null : $_POST['old_price']) : ($old['old_price'] ?? null);
+        $data['is_featured'] = (isset($_POST['is_featured']) && (string) $_POST['is_featured'] === '1') ? 1 : 0;
         if (!$data['product_name'] || !$data['brand'] || !$data['category_id'] || !in_array($data['status'], ['dang_ban', 'ngung_ban'], true)) {
             http_response_code(400);
             exit('Thông tin không hợp lệ');
