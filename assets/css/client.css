@@ -264,3 +264,24 @@ body {
     }
 }
 
+/* Các class tiện ích kích thước & typography cho giao diện MVC */
+.ui-style-1 { max-width: 480px; }
+.ui-style-2 { font-size: 0.68rem; }
+.ui-style-3 { font-size: 0.72rem; }
+.ui-style-4 { width: 76px; height: 76px; }
+.ui-style-5 { font-size: 0.78rem; }
+.ui-style-6 { width: 220px; height: 220px; }
+.ui-style-7 { width: 170px; }
+.ui-style-8 { width: 140px; }
+.ui-style-9 { width: 38%; }
+.ui-style-10 { width: 180px; }
+.ui-style-11 { max-width: 650px; }
+.ui-style-12 { font-size: 0.75rem; }
+.ui-style-13 { width: 160px; }
+.ui-style-14 { max-width: 700px; }
+.ui-style-15 { max-width: 820px; }
+.ui-style-16 { height: 190px; display: flex; align-items: center; justify-content: center; }
+.ui-style-17 { font-size: 0.7rem; }
+.ui-style-18 { min-width: 260px; }
+.ui-style-19 { min-width: 170px; }
+

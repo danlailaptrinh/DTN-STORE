@@ -115,7 +115,7 @@ class ProductController
         require __DIR__ . '/../view/layout/header.php';
 
         // Nạp View danh sách sản phẩm
-        require __DIR__ . '/../view/product/index.php';
+        require __DIR__ . '/../view/products/index.php';
 
         // Nạp Footer
         require __DIR__ . '/../view/layout/footer.php';
@@ -138,7 +138,7 @@ class ProductController
         require __DIR__ . '/../view/layout/header.php';
 
         // Nạp giao diện thêm sản phẩm
-        require __DIR__ . '/../view/product/create.php';
+        require __DIR__ . '/../view/products/create.php';
 
         // Nạp footer
         require __DIR__ . '/../view/layout/footer.php';
@@ -456,7 +456,7 @@ class ProductController
         $pageTitle = 'Sửa sản phẩm | DTD STORE';
         $activeMenu = 'products';
         require __DIR__ . '/../view/layout/header.php';
-        require __DIR__ . '/../view/product/edit.php';
+        require __DIR__ . '/../view/products/edit.php';
         require __DIR__ . '/../view/layout/footer.php';
     }
     public function update(int $id): void

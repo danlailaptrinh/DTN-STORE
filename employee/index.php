@@ -3,10 +3,7 @@
 use App\Helpers\SecurityHelper;
 use App\Helpers\SessionHelper;
 
-require_once __DIR__ . '/../admin/helpers/SessionHelper.php';
-require_once __DIR__ . '/../admin/helpers/SecurityHelper.php';
-
-SessionHelper::start();
+require_once __DIR__ . '/../config/view_helpers.php';
 
 if (!defined('APP_NAME')) {
     define('APP_NAME', 'DTD STORE');
@@ -26,7 +23,6 @@ $isKnownEmployeeRoute = $route === '/employee'
 $baseUrl = SecurityHelper::baseUrl();
 $adminProductsUrl = SecurityHelper::url('/admin/products');
 $clientUrl = SecurityHelper::url('/');
-$demoListUrl = $baseUrl . '/danh-sach-giao-dien.php';
 
 if ($isKnownEmployeeRoute) {
     http_response_code(501);
@@ -68,9 +64,6 @@ if ($isKnownEmployeeRoute) {
                         </a>
                         <a href="<?= SecurityHelper::e($clientUrl) ?>" class="btn btn-outline-dark">
                             <i class="bi bi-shop me-1"></i>Trang chủ Client
-                        </a>
-                        <a href="<?= SecurityHelper::e($demoListUrl) ?>" class="btn btn-outline-primary">
-                            <i class="bi bi-collection me-1"></i>Xem giao diện Demo riêng
                         </a>
                     </div>
                 </div>

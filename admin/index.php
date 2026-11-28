@@ -218,13 +218,13 @@ if ($unimplementedMeta !== null) {
             <span class="badge bg-warning text-dark mb-3 px-3 py-2">Chức năng đang phát triển</span>
             <h1 class="h4 fw-bold mb-2"><?= SecurityHelper::e($unimplementedMeta['title']) ?></h1>
             <p class="text-muted mb-2"><?= SecurityHelper::e($unimplementedMeta['desc']) ?></p>
-            <p class="text-muted small mb-4">Route hiện tại: <code><?= SecurityHelper::e($route) ?></code> (không tự động chuyển sang dữ liệu demo).</p>
+            <p class="text-muted small mb-4">Route hiện tại: <code><?= SecurityHelper::e($route) ?></code>.</p>
             <div class="d-flex flex-wrap justify-content-center gap-2">
                 <a href="<?= SecurityHelper::url('/admin/products') ?>" class="btn btn-dtd">
-                    <i class="bi bi-phone me-1"></i>Đi tới Quản lý sản phẩm (MVC thật)
+                    <i class="bi bi-phone me-1"></i>Đi tới Quản lý sản phẩm
                 </a>
-                <a href="<?= SecurityHelper::e(SecurityHelper::baseUrl() . '/danh-sach-giao-dien.php') ?>" class="btn btn-outline-secondary">
-                    <i class="bi bi-collection me-1"></i>Xem danh sách giao diện Demo
+                <a href="<?= SecurityHelper::url('/admin/categories') ?>" class="btn btn-outline-secondary">
+                    <i class="bi bi-tags me-1"></i>Đi tới Quản lý danh mục
                 </a>
             </div>
         </div>

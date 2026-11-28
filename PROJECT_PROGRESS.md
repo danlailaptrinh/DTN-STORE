@@ -52,11 +52,20 @@
 | 7.4.1 | Category Model — `countProducts()` và `delete()` | Đã xác nhận hoàn thành | Đã thêm `countProducts()` và `delete()` vào `admin/model/Category.php` |
 | 7.4.2 | CategoryController — `delete()` | Đã xác nhận hoàn thành | Đã thêm `delete()` trong `admin/controller/CategoryController.php` |
 | 7.4.3 | Kết nối Router `POST /admin/categories/delete` | Đã xác nhận hoàn thành | Đã kết nối trong `admin/index.php` |
-| 7.4.4 | Kiểm tra chức năng xóa danh mục | Đang thực hiện | Kiểm tra xóa danh mục trống, chặn xóa danh mục có sản phẩm và thông báo |
+| 7.4.4 | Kiểm tra chức năng xóa danh mục | Chưa làm | Sau tích hợp Router |
+
+### Mục 8 — Sắp xếp lại cấu trúc MVC & loại bỏ Demo
+
+| Mã bước | Nội dung | Trạng thái | Ghi chú |
+|---|---|---|---|
+| 8.1 | Chuẩn hóa giao diện & cấu trúc Admin (`admin/`) | Đã hoàn thành | Gộp `.ui-style-*` vào `dashboard.css`, bỏ `admin/view/product/`, gỡ link demo ở `admin/index.php` |
+| 8.2 | Chuẩn hóa giao diện Employee (`employee/`) | Đã hoàn thành | Tạo `config/view_helpers.php` chuẩn MVC, bỏ `demo.js` và link demo ở `employee/index.php` |
+| 8.3 | Chuẩn hóa giao diện Client (`view/client/`, `index.php`) | Đã hoàn thành | Gộp `.ui-style-*` vào `client.css`, bỏ `demo.js` và link demo ở `index.php` |
+| 8.4 | Xóa thư mục/file Demo và file rác không cần thiết | Đã hoàn thành | Đã xóa `demo/`, `giao_dien/`, file sample/preview trong `config/`, `demo.css`, `demo.js`, `danh-sach-giao-dien.php`, README/test cũ |
+| 8.5 | Kiểm tra toàn bộ hệ thống Admin, Employee, Client | Đã kiểm tra cú pháp PHP | Không còn tham chiếu demo; cần người dùng kiểm tra lại trên trình duyệt |
 
 ### Các bước tiếp theo
-1. Thực hiện 7.4.4: kiểm tra thực tế chức năng xóa danh mục trên trình duyệt.
-2. Chờ người dùng xác nhận `Xong 7.4.4`.
+1. Người dùng kiểm tra lại các trang Admin, Employee, Client trên trình duyệt (WAMP) và xác nhận **Xong 8.5**.
 
 ## Nhật ký công việc
 | Ngày | Bước | Nội dung / kết quả | Trạng thái |
